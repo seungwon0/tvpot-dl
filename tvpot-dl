@@ -20,7 +20,7 @@ use LWP::Simple qw< get getstore >;
 
 sub print_usage {
     print <<'END_USAGE';
-tvpot-dl 0.2
+tvpot-dl 0.3
 
 Usage:
 
@@ -41,7 +41,7 @@ END_USAGE
     return;
 }
 
-sub get_vid {
+sub get_video_id {
     my ($url) = @_;
 
     my $document = get($url);
@@ -52,23 +52,24 @@ sub get_vid {
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = "\Qhttp://flvs.daum.net/flvPlayer.swf\E";
-    my $vid_pattern    = qr{" $flv_player_url [?] vid = (?<vid>.+?) ["&]}xmsi;
-    if ( $document !~ $vid_pattern ) {
+    my $video_id_pattern
+        = qr{" $flv_player_url [?] vid = (?<video_id>.+?) ["&]}xmsi;
+    if ( $document !~ $video_id_pattern ) {
         warn "Cannot find video ID from the document.\n";
         return;
     }
-    my $vid = $LAST_PAREN_MATCH{vid};
+    my $video_id = $LAST_PAREN_MATCH{video_id};
 
-    return $vid;
+    return $video_id;
 }
 
 sub get_movie_url {
-    my ($vid) = @_;
+    my ($video_id) = @_;
 
     my $query_url
         = 'http://stream.tvpot.daum.net/fms/pos_query2.php'
         . '?service_id=1001&protocol=http&out_type=xml'
-        . "&s_idx=$vid";
+        . "&s_idx=$video_id";
 
     my $document = get($query_url);
     if ( !defined $document ) {
@@ -92,17 +93,17 @@ sub download_url {
     my ($url) = @_;
 
     # Step 1: Get video ID
-    my $vid = get_vid($url);
-    return if !defined $vid;
-    say "Video ID: $vid";
+    my $video_id = get_video_id($url);
+    return if !defined $video_id;
+    say "Video ID: $video_id";
 
     # Step 2: Get movie URL
-    my $movie_url = get_movie_url($vid);
+    my $movie_url = get_movie_url($video_id);
     return if !defined $movie_url;
     say "Movie URL: $movie_url";
 
     # Step 3: Download the movie
-    my $file_name = "$vid.flv";
+    my $file_name = "$video_id.flv";
     say "Downloading the movie as $file_name... "
         . '(It may takes several minutes.)';
     getstore( $movie_url, $file_name );
@@ -118,11 +119,8 @@ if ( !-t STDIN ) {
     while ( defined( my $line = <STDIN> ) ) {
         chomp $line;
 
-        # Remove comment
-        $line =~ s/[#] .*//xms;
-
-        # Trim spaces
-        $line =~ s/\s+//xmsg;
+        $line =~ s/[ #] .*//xms;    # Remove comment
+        $line =~ s/\s+//xmsg;       # Trim spaces
 
         if ( $line ne q{} ) {
             push @urls, $line;
