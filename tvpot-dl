@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+#
+# tvpot-dl - Download flash video from Daum tvpot
+#
+# Seungwon Jeong <seungwon0@gmail.com>
+#
+# Copyright (C) 2011 by Seungwon Jeong
+
+use strict;
+
+use warnings;
+
+use 5.010;
+
+use autodie;
+
+use English qw< -no_match_vars >;
+
+use LWP::Simple qw< get getstore >;
+
+sub print_usage {
+    print <<'END_USAGE';
+tvpot-dl 0.1
+
+Usage:
+
+  tvpot-dl URL
+
+Argument:
+
+  URL      URL of a tvpot video
+
+Examples:
+
+  tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925'
+  tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+
+Please report bugs to <seungwon0@gmail.com>.
+END_USAGE
+    return;
+}
+
+sub get_vid {
+    my ($url) = @_;
+
+    my $document = get($url);
+    if ( !defined $document ) {
+        die "Cannot fetch the document identified by the given URL: $url\n";
+    }
+
+    # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
+    my $flv_player_url = "\Qhttp://flvs.daum.net/flvPlayer.swf\E";
+    my $vid_pattern    = qr{" $flv_player_url [?] vid = (?<vid>.+?) ["&]}xmsi;
+    if ( $document !~ $vid_pattern ) {
+        die "Cannot find video ID from the document.\n";
+    }
+    my $vid = $LAST_PAREN_MATCH{vid};
+
+    return $vid;
+}
+
+sub get_movie_url {
+    my ($vid) = @_;
+
+    my $query_url
+        = 'http://stream.tvpot.daum.net/fms/pos_query2.php'
+        . '?service_id=1001&protocol=http&out_type=xml'
+        . "&s_idx=$vid";
+
+    my $document = get($query_url);
+    if ( !defined $document ) {
+        die 'Cannot fetch the document identified by the given URL: '
+          . "$query_url\n";
+    }
+
+    # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
+    my $movie_url_pattern = qr{movieURL = "(?<movie_url>.+?)"}xmsi;
+    if ( $document !~ $movie_url_pattern ) {
+        die "Cannot find movie URL from the document.\n";
+    }
+    my $movie_url = $LAST_PAREN_MATCH{movie_url};
+
+    return $movie_url;
+}
+
+if ( @ARGV != 1 ) {
+    print_usage();
+    exit 2;
+}
+
+my $url = shift;
+
+my $vid = get_vid($url);
+say "Video ID: $vid";
+
+my $movie_url = get_movie_url($vid);
+say "Movie URL: $movie_url";
+
+my $file_name = "$vid.flv";
+say "Downloading movie as $file_name... (It may takes several minutes.)";
+getstore( $movie_url, $file_name );
+say 'Download completed.';
