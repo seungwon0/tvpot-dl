@@ -34,6 +34,7 @@ Examples:
 
   tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925'
   tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+  tvpot-dl < url_list
 
 Please report bugs to <seungwon0@gmail.com>.
 END_USAGE
@@ -110,14 +111,36 @@ sub download_url {
     return;
 }
 
-if ( @ARGV < 1 ) {
+my @urls = @ARGV;
+
+# tvpot-dl < url_list
+if ( !-t STDIN ) {
+    while ( defined( my $line = <STDIN> ) ) {
+        chomp $line;
+
+        # Remove comment
+        $line =~ s/[#] .*//xms;
+
+        # Trim spaces
+        $line =~ s/\s+//xmsg;
+
+        if ( $line ne q{} ) {
+            push @urls, $line;
+        }
+    }
+}
+
+if ( @urls < 1 ) {
     print_usage();
     exit 2;
 }
 
-for my $idx ( 0 .. $#ARGV ) {
-    my $url = $ARGV[$idx];
-    printf "[%d/%d] %s\n", $idx + 1, scalar @ARGV, $url;
+for my $i ( 0 .. $#urls ) {
+    my $url = $urls[$i];
+
+    printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+
     download_url($url);
-    say q{};
+
+    say q{};    # Blank line
 }
