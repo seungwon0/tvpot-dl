@@ -90,12 +90,15 @@ if ( @ARGV != 1 ) {
 
 my $url = shift;
 
+# Step 1: Get video ID
 my $vid = get_vid($url);
 say "Video ID: $vid";
 
+# Step 2: Get movie URL
 my $movie_url = get_movie_url($vid);
 say "Movie URL: $movie_url";
 
+# Step 3: Download the movie
 my $file_name = "$vid.flv";
 say "Downloading movie as $file_name... (It may takes several minutes.)";
 getstore( $movie_url, $file_name );
