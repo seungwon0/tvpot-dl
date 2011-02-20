@@ -20,11 +20,11 @@ use LWP::Simple qw< get getstore >;
 
 sub print_usage {
     print <<'END_USAGE';
-tvpot-dl 0.1
+tvpot-dl 0.2
 
 Usage:
 
-  tvpot-dl URL
+  tvpot-dl URL...
 
 Argument:
 
@@ -45,14 +45,16 @@ sub get_vid {
 
     my $document = get($url);
     if ( !defined $document ) {
-        die "Cannot fetch the document identified by the given URL: $url\n";
+        warn "Cannot fetch the document identified by the given URL: $url\n";
+        return;
     }
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = "\Qhttp://flvs.daum.net/flvPlayer.swf\E";
     my $vid_pattern    = qr{" $flv_player_url [?] vid = (?<vid>.+?) ["&]}xmsi;
     if ( $document !~ $vid_pattern ) {
-        die "Cannot find video ID from the document.\n";
+        warn "Cannot find video ID from the document.\n";
+        return;
     }
     my $vid = $LAST_PAREN_MATCH{vid};
 
@@ -69,37 +71,53 @@ sub get_movie_url {
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        die 'Cannot fetch the document identified by the given URL: '
-          . "$query_url\n";
+        warn 'Cannot fetch the document identified by the given URL: '
+            . "$query_url\n";
+        return;
     }
 
     # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
     my $movie_url_pattern = qr{movieURL = "(?<movie_url>.+?)"}xmsi;
     if ( $document !~ $movie_url_pattern ) {
-        die "Cannot find movie URL from the document.\n";
+        warn "Cannot find movie URL from the document.\n";
+        return;
     }
     my $movie_url = $LAST_PAREN_MATCH{movie_url};
 
     return $movie_url;
 }
 
-if ( @ARGV != 1 ) {
+sub download_url {
+    my ($url) = @_;
+
+    # Step 1: Get video ID
+    my $vid = get_vid($url);
+    return if !defined $vid;
+    say "Video ID: $vid";
+
+    # Step 2: Get movie URL
+    my $movie_url = get_movie_url($vid);
+    return if !defined $movie_url;
+    say "Movie URL: $movie_url";
+
+    # Step 3: Download the movie
+    my $file_name = "$vid.flv";
+    say "Downloading the movie as $file_name... "
+        . '(It may takes several minutes.)';
+    getstore( $movie_url, $file_name );
+    say 'Download completed.';
+
+    return;
+}
+
+if ( @ARGV < 1 ) {
     print_usage();
     exit 2;
 }
 
-my $url = shift;
-
-# Step 1: Get video ID
-my $vid = get_vid($url);
-say "Video ID: $vid";
-
-# Step 2: Get movie URL
-my $movie_url = get_movie_url($vid);
-say "Movie URL: $movie_url";
-
-# Step 3: Download the movie
-my $file_name = "$vid.flv";
-say "Downloading movie as $file_name... (It may takes several minutes.)";
-getstore( $movie_url, $file_name );
-say 'Download completed.';
+for my $idx ( 0 .. $#ARGV ) {
+    my $url = $ARGV[$idx];
+    printf "[%d/%d] %s\n", $idx + 1, scalar @ARGV, $url;
+    download_url($url);
+    say q{};
+}
