@@ -32,7 +32,7 @@ our $VERSION = '0.3.1';
 
     App::TvpotDl::download_video($url);
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
 =head2 get_video_id
 
@@ -161,8 +161,6 @@ L<http://search.cpan.org/dist/tvpot-dl/>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2011 Seungwon Jeong.
@@ -175,4 +173,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of App::TvpotDl
+1;    # End of App::TvpotDl
