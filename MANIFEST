@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/TvpotDl.pm
+bin/tvpot-dl
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

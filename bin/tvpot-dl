@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+#
+# tvpot-dl - Download flash videos from Daum tvpot
+#
+# Seungwon Jeong <seungwon0@gmail.com>
+#
+# Copyright (C) 2011 by Seungwon Jeong
+
+use strict;
+
+use warnings;
+
+use 5.010;
+
+use autodie;
+
+use App::TvpotDl;
+
+sub print_usage {
+    print <<'END_USAGE';
+tvpot-dl 0.3.0
+
+Usage:
+
+  tvpot-dl URL...
+
+Argument:
+
+  URL      URL of a tvpot video
+
+Examples:
+
+  tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925'
+  tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+  tvpot-dl < url_list
+
+Please report bugs to <seungwon0@gmail.com>.
+END_USAGE
+    return;
+}
+
+my @urls = @ARGV;
+
+# tvpot-dl < url_list
+if ( !-t STDIN ) {
+    while ( defined( my $line = <STDIN> ) ) {
+        chomp $line;
+
+        $line =~ s/[ #] .*//xms;    # Remove comment
+        $line =~ s/\s+//xmsg;       # Trim spaces
+
+        if ( $line ne q{} ) {
+            push @urls, $line;
+        }
+    }
+}
+
+if ( @urls < 1 ) {
+    print_usage();
+    exit 2;
+}
+
+for my $i ( 0 .. $#urls ) {
+    my $url = $urls[$i];
+
+    printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+
+    App::TvpotDl::download_url($url);
+
+    say q{};    # Blank line
+}

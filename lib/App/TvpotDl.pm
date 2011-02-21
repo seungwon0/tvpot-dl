@@ -1,10 +1,4 @@
-#!/usr/bin/env perl
-#
-# tvpot-dl - Download flash video from Daum tvpot
-#
-# Seungwon Jeong <seungwon0@gmail.com>
-#
-# Copyright (C) 2011 by Seungwon Jeong
+package App::TvpotDl;
 
 use strict;
 
@@ -18,28 +12,33 @@ use English qw< -no_match_vars >;
 
 use LWP::Simple qw< get getstore >;
 
-sub print_usage {
-    print <<'END_USAGE';
-tvpot-dl 0.3
+=head1 NAME
 
-Usage:
+App::TvpotDl - Download flash videos from Daum tvpot
 
-  tvpot-dl URL...
+=head1 VERSION
 
-Argument:
+Version 0.3.0
 
-  URL      URL of a tvpot video
+=cut
 
-Examples:
+our $VERSION = '0.3.0';
 
-  tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925'
-  tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
-  tvpot-dl < url_list
+=head1 SYNOPSIS
 
-Please report bugs to <seungwon0@gmail.com>.
-END_USAGE
-    return;
-}
+    use App::TvpotDl;
+
+    my $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925';
+
+    App::TvpotDl->download_url($url);
+
+=head1 SUBROUTINES/METHODS
+
+=head2 get_video_id
+
+Returns video ID of the given tvpot URL.
+
+=cut
 
 sub get_video_id {
     my ($url) = @_;
@@ -62,6 +61,12 @@ sub get_video_id {
 
     return $video_id;
 }
+
+=head2 get_movie_url
+
+Returns movie URL of the given video ID.
+
+=cut
 
 sub get_movie_url {
     my ($video_id) = @_;
@@ -89,6 +94,12 @@ sub get_movie_url {
     return $movie_url;
 }
 
+=head2 download_url
+
+Downloads a flash video from the given tvpot URL.
+
+=cut
+
 sub download_url {
     my ($url) = @_;
 
@@ -112,33 +123,56 @@ sub download_url {
     return;
 }
 
-my @urls = @ARGV;
+=head1 AUTHOR
 
-# tvpot-dl < url_list
-if ( !-t STDIN ) {
-    while ( defined( my $line = <STDIN> ) ) {
-        chomp $line;
+Seungwon Jeong, C<< <seungwon0 at gmail.com> >>
 
-        $line =~ s/[ #] .*//xms;    # Remove comment
-        $line =~ s/\s+//xmsg;       # Trim spaces
+=head1 BUGS
 
-        if ( $line ne q{} ) {
-            push @urls, $line;
-        }
-    }
-}
+Please report any bugs or feature requests to C<bug-tvpot-dl at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=tvpot-dl>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
-if ( @urls < 1 ) {
-    print_usage();
-    exit 2;
-}
+=head1 SUPPORT
 
-for my $i ( 0 .. $#urls ) {
-    my $url = $urls[$i];
+You can find documentation for this module with the perldoc command.
 
-    printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+    perldoc App::TvpotDl
 
-    download_url($url);
+You can also look for information at:
 
-    say q{};    # Blank line
-}
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=tvpot-dl>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/tvpot-dl>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/tvpot-dl>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/tvpot-dl/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Seungwon Jeong.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+1; # End of App::TvpotDl

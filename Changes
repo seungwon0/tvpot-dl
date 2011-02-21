@@ -1,0 +1,11 @@
+Revision history for tvpot-dl
+
+0.3.0   Mon Feb 21 23:52:14 KST 2011
+        Started to use Module::Starter.
+
+0.2     Sun Feb 20 22:44:40 2011 +0900
+        Support multiple arguments.
+        Support URL list from STDIN.
+
+0.1     Sun Feb 20 17:54:22 2011 +0900
+        First version, released on an unsuspecting world.
