@@ -18,19 +18,19 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.3.1
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 =head1 SYNOPSIS
 
     use App::TvpotDl;
 
-    my $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925';
+    my $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622';
 
-    App::TvpotDl->download_url($url);
+    App::TvpotDl::download_video($url);
 
 =head1 SUBROUTINES/METHODS
 
@@ -94,13 +94,13 @@ sub get_movie_url {
     return $movie_url;
 }
 
-=head2 download_url
+=head2 download_video
 
 Downloads a flash video from the given tvpot URL.
 
 =cut
 
-sub download_url {
+sub download_video {
     my ($url) = @_;
 
     # Step 1: Get video ID

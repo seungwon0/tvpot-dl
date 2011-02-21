@@ -17,8 +17,8 @@ use autodie;
 use App::TvpotDl;
 
 sub print_usage {
-    print <<'END_USAGE';
-tvpot-dl 0.3.0
+    print <<"END_USAGE";
+tvpot-dl $App::TvpotDl::VERSION
 
 Usage:
 
@@ -30,11 +30,11 @@ Argument:
 
 Examples:
 
-  tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=21319925'
+  tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
   tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
   tvpot-dl < url_list
 
-Please report bugs to <seungwon0@gmail.com>.
+Please report bugs to <seungwon0\@gmail.com>.
 END_USAGE
     return;
 }
@@ -65,7 +65,7 @@ for my $i ( 0 .. $#urls ) {
 
     printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
 
-    App::TvpotDl::download_url($url);
+    App::TvpotDl::download_video($url);
 
     say q{};    # Blank line
 }
