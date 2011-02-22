@@ -10,7 +10,7 @@ use autodie;
 
 use English qw< -no_match_vars >;
 
-use LWP::Simple qw< get getstore >;
+use LWP::Simple qw< get getstore is_error >;
 
 use Encode qw< encode_utf8 >;
 
@@ -89,7 +89,7 @@ sub get_movie_title {
         warn "Cannot find movie title from the document.\n";
         return;
     }
-    my $movie_title = encode_utf8($LAST_PAREN_MATCH{movie_title});
+    my $movie_title = encode_utf8( $LAST_PAREN_MATCH{movie_title} );
 
     return $movie_title;
 }
@@ -152,12 +152,17 @@ sub download_video {
 
     # Step 4: Download the movie
     my $file_name = "$movie_title.flv";
-    say "Downloading the movie as $file_name... "
+    say "Downloading the movie as '$file_name'... "
         . '(It may takes several minutes.)';
-    getstore( $movie_url, $file_name );
-    say 'Download completed.';
+    my $rc = getstore( $movie_url, $file_name );
+    if ( is_error($rc) ) {
+        warn "Cannot download the movie.\n";
+        return;
+    }
 
-    return;
+    say "Successfully downloaded '$file_name'.";
+
+    return 1;
 }
 
 =head1 AUTHOR
