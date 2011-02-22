@@ -62,6 +62,36 @@ sub get_video_id {
     return $video_id;
 }
 
+=head2 get_movie_title
+
+Returns movie title of the given video ID.
+
+=cut
+
+sub get_movie_title {
+    my ($video_id) = @_;
+
+    my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
+
+    my $document = get($query_url);
+    if ( !defined $document ) {
+        warn 'Cannot fetch the document identified by the given URL: '
+            . "$query_url\n";
+        return;
+    }
+
+    # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
+    my $movie_title_pattern
+        = qr{<TITLE> <!\[CDATA \[ (?<movie_title>.+?) \] \]> </TITLE>}xmsi;
+    if ( $document !~ $movie_title_pattern ) {
+        warn "Cannot find movie title from the document.\n";
+        return;
+    }
+    my $movie_title = $LAST_PAREN_MATCH{movie_title};
+
+    return $movie_title;
+}
+
 =head2 get_movie_url
 
 Returns movie URL of the given video ID.
@@ -108,13 +138,18 @@ sub download_video {
     return if !defined $video_id;
     say "Video ID: $video_id";
 
-    # Step 2: Get movie URL
+    # Step 2: Get movie title
+    my $movie_title = get_movie_title($video_id);
+    return if !defined $movie_title;
+    say "Movie title: $movie_title";
+
+    # Step 3: Get movie URL
     my $movie_url = get_movie_url($video_id);
     return if !defined $movie_url;
     say "Movie URL: $movie_url";
 
-    # Step 3: Download the movie
-    my $file_name = "$video_id.flv";
+    # Step 4: Download the movie
+    my $file_name = "$movie_title.flv";
     say "Downloading the movie as $file_name... "
         . '(It may takes several minutes.)';
     getstore( $movie_url, $file_name );
