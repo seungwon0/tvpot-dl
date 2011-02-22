@@ -12,6 +12,8 @@ use English qw< -no_match_vars >;
 
 use LWP::Simple qw< get getstore >;
 
+use Encode qw< encode_utf8 >;
+
 =head1 NAME
 
 App::TvpotDl - Download flash videos from Daum tvpot
@@ -87,7 +89,7 @@ sub get_movie_title {
         warn "Cannot find movie title from the document.\n";
         return;
     }
-    my $movie_title = $LAST_PAREN_MATCH{movie_title};
+    my $movie_title = encode_utf8($LAST_PAREN_MATCH{movie_title});
 
     return $movie_title;
 }
