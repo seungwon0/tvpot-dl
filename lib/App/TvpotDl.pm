@@ -14,17 +14,19 @@ use LWP::Simple qw< get getstore is_error >;
 
 use Encode qw< encode_utf8 >;
 
+use Carp qw< carp >;
+
 =head1 NAME
 
 App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.4.1
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 
 =head1 SYNOPSIS
 
@@ -47,7 +49,7 @@ sub get_video_id {
 
     my $document = get($url);
     if ( !defined $document ) {
-        warn "Cannot fetch the document identified by the given URL: $url\n";
+        carp "Cannot fetch the document identified by the given URL: $url\n";
         return;
     }
 
@@ -56,7 +58,7 @@ sub get_video_id {
     my $video_id_pattern
         = qr{" $flv_player_url [?] vid = (?<video_id>.+?) ["&]}xmsi;
     if ( $document !~ $video_id_pattern ) {
-        warn "Cannot find video ID from the document.\n";
+        carp "Cannot find video ID from the document.\n";
         return;
     }
     my $video_id = $LAST_PAREN_MATCH{video_id};
@@ -77,7 +79,7 @@ sub get_movie_title {
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        warn 'Cannot fetch the document identified by the given URL: '
+        carp 'Cannot fetch the document identified by the given URL: '
             . "$query_url\n";
         return;
     }
@@ -86,7 +88,7 @@ sub get_movie_title {
     my $movie_title_pattern
         = qr{<TITLE> <!\[CDATA \[ (?<movie_title>.+?) \] \]> </TITLE>}xmsi;
     if ( $document !~ $movie_title_pattern ) {
-        warn "Cannot find movie title from the document.\n";
+        carp "Cannot find movie title from the document.\n";
         return;
     }
     my $movie_title = encode_utf8( $LAST_PAREN_MATCH{movie_title} );
@@ -110,7 +112,7 @@ sub get_movie_url {
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        warn 'Cannot fetch the document identified by the given URL: '
+        carp 'Cannot fetch the document identified by the given URL: '
             . "$query_url\n";
         return;
     }
@@ -118,7 +120,7 @@ sub get_movie_url {
     # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
     my $movie_url_pattern = qr{movieURL = "(?<movie_url>.+?)"}xmsi;
     if ( $document !~ $movie_url_pattern ) {
-        warn "Cannot find movie URL from the document.\n";
+        carp "Cannot find movie URL from the document.\n";
         return;
     }
     my $movie_url = $LAST_PAREN_MATCH{movie_url};
@@ -156,7 +158,7 @@ sub download_video {
         . '(It may takes several minutes.)';
     my $rc = getstore( $movie_url, $file_name );
     if ( is_error($rc) ) {
-        warn "Cannot download the movie.\n";
+        carp "Cannot download the movie.\n";
         return;
     }
 

@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
 	'English'     => 0,
 	'LWP::Simple' => 0,
 	'Encode'      => 0,
+	'Carp'        => 0,
     },
     build_requires => {
         'Test::More' => 0,
