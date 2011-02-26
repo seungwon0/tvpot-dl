@@ -16,6 +16,8 @@ use autodie;
 
 use Getopt::Long;
 
+use LWP::Simple qw< getstore is_error >;
+
 use App::TvpotDl;
 
 sub print_version {
@@ -53,6 +55,39 @@ Examples:
 Please report bugs to <seungwon0\@gmail.com>.
 END_HELP
     return;
+}
+
+sub download_video {
+    my ($url) = @_;
+
+    # Step 1: Get video ID
+    my $video_id = App::TvpotDl::get_video_id($url);
+    return if !defined $video_id;
+    say "Video ID: $video_id";
+
+    # Step 2: Get video title
+    my $video_title = App::TvpotDl::get_video_title($video_id);
+    return if !defined $video_title;
+    say "Video title: $video_title";
+
+    # Step 3: Get video URL
+    my $video_url = App::TvpotDl::get_video_url($video_id);
+    return if !defined $video_url;
+    say "Video URL: $video_url";
+
+    # Step 4: Download the video
+    my $file_name = "$video_title.flv";
+    say "Downloading the video as '$file_name'... "
+        . '(It may takes several minutes.)';
+    my $rc = getstore( $video_url, $file_name );
+    if ( is_error($rc) ) {
+        warn "Cannot download the video.\n";
+        return;
+    }
+
+    say "Successfully downloaded '$file_name'.";
+
+    return 1;
 }
 
 my $help;
@@ -97,7 +132,7 @@ for my $i ( 0 .. $#urls ) {
 
     printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
 
-    App::TvpotDl::download_video($url);
+    download_video($url);
 
     say q{};    # Blank line
 }
