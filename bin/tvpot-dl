@@ -14,29 +14,61 @@ use 5.010;
 
 use autodie;
 
+use Getopt::Long;
+
 use App::TvpotDl;
 
-sub print_usage {
-    print <<"END_USAGE";
-tvpot-dl $App::TvpotDl::VERSION
+sub print_version {
+    say "tvpot-dl $App::TvpotDl::VERSION";
+    return;
+}
+
+sub print_help {
+    print_version();
+
+    print <<"END_HELP";
 
 Usage:
 
-  tvpot-dl URL...
+  tvpot-dl [options] URL...
+
+Options:
+
+  -h, --help            print this help text and exit
+  -v, --version         print program version and exit
 
 Argument:
 
-  URL      URL of a tvpot video
+  URL                   URL of a tvpot video
 
 Examples:
 
   tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
   tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+  tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
+  tvpot-dl 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=P3G7gyZgrVk0&playlistid=1384392&clipid=30724905'
+  tvpot-dl 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851'
   tvpot-dl < url_list
 
 Please report bugs to <seungwon0\@gmail.com>.
-END_USAGE
+END_HELP
     return;
+}
+
+my $help;
+my $version;
+
+GetOptions( help => \$help, version => \$version )
+    or die "GetOptions() failed!\n";
+
+if ($help) {
+    print_help();
+    exit;
+}
+
+if ($version) {
+    print_version();
+    exit;
 }
 
 my @urls = @ARGV;
@@ -56,7 +88,7 @@ if ( !-t STDIN ) {
 }
 
 if ( @urls < 1 ) {
-    print_usage();
+    print_help();
     exit 2;
 }
 
