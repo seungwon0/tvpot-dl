@@ -1,5 +1,9 @@
 Revision history for tvpot-dl
 
+0.5.0   Sun Feb 27 01:20:14 2011 +0900
+        Changed some APIs.
+        Added --quiet, --title and --url option.
+
 0.4.2   Sat Feb 26 15:32:06 2011 +0900
         Added --help and --version option.
 
