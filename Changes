@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.4.2   Sat Feb 26 15:32:06 2011 +0900
+        Added --help and --version option.
+
 0.4.1   Thu Feb 24 09:03:34 2011 +0900
         Started to use Carp.
 
