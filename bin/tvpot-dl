@@ -58,42 +58,53 @@ END_HELP
 }
 
 sub download_video {
-    my ($url) = @_;
+    my ( $url, $quiet ) = @_;
 
     # Step 1: Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
     return if !defined $video_id;
-    say "Video ID: $video_id";
+    if ( !$quiet ) {
+        say "Video ID: $video_id";
+    }
 
     # Step 2: Get video title
     my $video_title = App::TvpotDl::get_video_title($video_id);
     return if !defined $video_title;
-    say "Video title: $video_title";
+    if ( !$quiet ) {
+        say "Video title: $video_title";
+    }
 
     # Step 3: Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
     return if !defined $video_url;
-    say "Video URL: $video_url";
+    if ( !$quiet ) {
+        say "Video URL: $video_url";
+    }
 
     # Step 4: Download the video
     my $file_name = "$video_title.flv";
-    say "Downloading the video as '$file_name'... "
-        . '(It may takes several minutes.)';
+    if ( !$quiet ) {
+        say "Downloading the video as '$file_name'... "
+            . '(It may takes several minutes.)';
+    }
     my $rc = getstore( $video_url, $file_name );
     if ( is_error($rc) ) {
         warn "Cannot download the video.\n";
         return;
     }
 
-    say "Successfully downloaded '$file_name'.";
+    if ( !$quiet ) {
+        say "Successfully downloaded '$file_name'.";
+    }
 
     return 1;
 }
 
 my $help;
 my $version;
+my $quiet;
 
-GetOptions( help => \$help, version => \$version )
+GetOptions( help => \$help, version => \$version, quiet => \$quiet )
     or die "GetOptions() failed!\n";
 
 if ($help) {
@@ -130,9 +141,13 @@ if ( @urls < 1 ) {
 for my $i ( 0 .. $#urls ) {
     my $url = $urls[$i];
 
-    printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+    if ( !$quiet ) {
+        printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+    }
 
-    download_video($url);
+    download_video( $url, $quiet );
 
-    say q{};    # Blank line
+    if ( !$quiet ) {
+        say q{};    # Blank line
+    }
 }
