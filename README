@@ -1,6 +1,9 @@
-tvpot-dl 0.4.2
+tvpot-dl 0.5.0
 
-Downloads flash videos from Daum tvpot.
+tvpot-dl downloads flash videos from Daum tvpot.
+
+It can also be used to download movie trailers or music videos from
+Daum.
 
 
 INSTALLATION

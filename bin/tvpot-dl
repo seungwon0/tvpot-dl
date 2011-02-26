@@ -16,6 +16,8 @@ use autodie;
 
 use Getopt::Long;
 
+use LWP::Simple qw< getstore is_error >;
+
 use App::TvpotDl;
 
 sub print_version {
@@ -36,6 +38,9 @@ Options:
 
   -h, --help            print this help text and exit
   -v, --version         print program version and exit
+  -q, --quiet           activates quiet mode
+  -t, --title           simulate, quiet but print title
+  -u, --url             simulate, quiet but print URL
 
 Argument:
 
@@ -46,7 +51,7 @@ Examples:
   tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
   tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
   tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
-  tvpot-dl 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=P3G7gyZgrVk0&playlistid=1384392&clipid=30724905'
+  tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=P3G7gyZgrVk0&playlistid=1384392&clipid=30724905' | xargs wget
   tvpot-dl 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851'
   tvpot-dl < url_list
 
@@ -55,18 +60,83 @@ END_HELP
     return;
 }
 
-my $help;
-my $version;
+sub download_video {
+    my ( $url, $arg_ref ) = @_;
+    my $quiet_mode  = $arg_ref->{quiet_mode};
+    my $print_title = $arg_ref->{print_title};
+    my $print_url   = $arg_ref->{print_url};
 
-GetOptions( help => \$help, version => \$version )
-    or die "GetOptions() failed!\n";
+    # Step 1: Get video ID
+    my $video_id = App::TvpotDl::get_video_id($url);
+    return if !defined $video_id;
+    if ( !$quiet_mode ) {
+        say "Video ID: $video_id";
+    }
 
-if ($help) {
+    # Step 2: Get video title
+    my $video_title = App::TvpotDl::get_video_title($video_id);
+    return if !defined $video_title;
+    if ($print_title) {
+        say $video_title;
+        return 1;
+    }
+    if ( !$quiet_mode ) {
+        say "Video title: $video_title";
+    }
+
+    # Step 3: Get video URL
+    my $video_url = App::TvpotDl::get_video_url($video_id);
+    return if !defined $video_url;
+    if ($print_url) {
+        say $video_url;
+        return 1;
+    }
+    if ( !$quiet_mode ) {
+        say "Video URL: $video_url";
+    }
+
+    # Step 4: Download the video
+    my $file_name = "$video_title.flv";
+    if ( !$quiet_mode ) {
+        say "Downloading the video as '$file_name'... "
+            . '(It may takes several minutes.)';
+    }
+    my $rc = getstore( $video_url, $file_name );
+    if ( is_error($rc) ) {
+        warn "Cannot download the video.\n";
+        return;
+    }
+
+    if ( !$quiet_mode ) {
+        say "Successfully downloaded '$file_name'.";
+    }
+
+    return 1;
+}
+
+my $print_help;
+my $print_version;
+
+my $quiet_mode;
+my $print_title;
+my $print_url;
+
+GetOptions(
+    help    => \$print_help,
+    version => \$print_version,
+    quiet   => \$quiet_mode,
+    title   => \$print_title,
+    url     => \$print_url,
+) or die "GetOptions() failed!\n";
+
+$quiet_mode = $quiet_mode || $print_title || $print_url;
+
+if ($print_help) {
     print_help();
     exit;
 }
 
-if ($version) {
+if ($print_version) {
     print_version();
     exit;
 }
@@ -92,12 +162,22 @@ if ( @urls < 1 ) {
     exit 2;
 }
 
+my $arg_ref = {
+    quiet_mode  => $quiet_mode,
+    print_title => $print_title,
+    print_url   => $print_url,
+};
+
 for my $i ( 0 .. $#urls ) {
     my $url = $urls[$i];
 
-    printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+    if ( !$quiet_mode ) {
+        printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
+    }
 
-    App::TvpotDl::download_video($url);
+    download_video( $url, $arg_ref );
 
-    say q{};    # Blank line
+    if ( !$quiet_mode ) {
+        say q{};    # Blank line
+    }
 }

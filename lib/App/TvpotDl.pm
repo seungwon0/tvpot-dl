@@ -4,13 +4,9 @@ use strict;
 
 use warnings;
 
-use 5.010;
-
-use autodie;
-
 use English qw< -no_match_vars >;
 
-use LWP::Simple qw< get getstore is_error >;
+use LWP::Simple qw< get >;
 
 use Encode qw< encode_utf8 >;
 
@@ -22,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.4.2
+Version 0.5.0
 
 =cut
 
-our $VERSION = '0.4.2';
+our $VERSION = '0.5.0';
 
 =head1 SYNOPSIS
 
@@ -34,7 +30,14 @@ our $VERSION = '0.4.2';
 
     my $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622';
 
-    App::TvpotDl::download_video($url);
+    # Get video ID
+    my $video_id = App::TvpotDl::get_video_id($url);
+
+    # Get video title
+    my $video_title = App::TvpotDl::get_video_title($video_id);
+
+    # Get video URL
+    my $video_url = App::TvpotDl::get_video_url($video_id);
 
 =head1 SUBROUTINES
 
@@ -66,13 +69,13 @@ sub get_video_id {
     return $video_id;
 }
 
-=head2 get_movie_title
+=head2 get_video_title
 
-Returns movie title of the given video ID.
+Returns title of the given video ID.
 
 =cut
 
-sub get_movie_title {
+sub get_video_title {
     my ($video_id) = @_;
 
     my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
@@ -85,24 +88,24 @@ sub get_movie_title {
     }
 
     # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
-    my $movie_title_pattern
-        = qr{<TITLE> <!\[CDATA \[ (?<movie_title>.+?) \] \]> </TITLE>}xmsi;
-    if ( $document !~ $movie_title_pattern ) {
-        carp "Cannot find movie title from the document.\n";
+    my $video_title_pattern
+        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
+    if ( $document !~ $video_title_pattern ) {
+        carp "Cannot find video title from the document.\n";
         return;
     }
-    my $movie_title = encode_utf8( $LAST_PAREN_MATCH{movie_title} );
+    my $video_title = encode_utf8( $LAST_PAREN_MATCH{video_title} );
 
-    return $movie_title;
+    return $video_title;
 }
 
-=head2 get_movie_url
+=head2 get_video_url
 
-Returns movie URL of the given video ID.
+Returns video URL of the given video ID.
 
 =cut
 
-sub get_movie_url {
+sub get_video_url {
     my ($video_id) = @_;
 
     my $query_url
@@ -118,53 +121,14 @@ sub get_movie_url {
     }
 
     # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
-    my $movie_url_pattern = qr{movieURL = "(?<movie_url>.+?)"}xmsi;
-    if ( $document !~ $movie_url_pattern ) {
-        carp "Cannot find movie URL from the document.\n";
+    my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
+    if ( $document !~ $video_url_pattern ) {
+        carp "Cannot find video URL from the document.\n";
         return;
     }
-    my $movie_url = $LAST_PAREN_MATCH{movie_url};
+    my $video_url = $LAST_PAREN_MATCH{video_url};
 
-    return $movie_url;
-}
-
-=head2 download_video
-
-Downloads a flash video from the given tvpot URL.
-
-=cut
-
-sub download_video {
-    my ($url) = @_;
-
-    # Step 1: Get video ID
-    my $video_id = get_video_id($url);
-    return if !defined $video_id;
-    say "Video ID: $video_id";
-
-    # Step 2: Get movie title
-    my $movie_title = get_movie_title($video_id);
-    return if !defined $movie_title;
-    say "Movie title: $movie_title";
-
-    # Step 3: Get movie URL
-    my $movie_url = get_movie_url($video_id);
-    return if !defined $movie_url;
-    say "Movie URL: $movie_url";
-
-    # Step 4: Download the movie
-    my $file_name = "$movie_title.flv";
-    say "Downloading the movie as '$file_name'... "
-        . '(It may takes several minutes.)';
-    my $rc = getstore( $movie_url, $file_name );
-    if ( is_error($rc) ) {
-        carp "Cannot download the movie.\n";
-        return;
-    }
-
-    say "Successfully downloaded '$file_name'.";
-
-    return 1;
+    return $video_url;
 }
 
 =head1 AUTHOR
