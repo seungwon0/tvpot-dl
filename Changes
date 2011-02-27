@@ -1,10 +1,13 @@
 Revision history for tvpot-dl
 
+0.6.3   Sun Feb 27 18:19:19 2011 +0900
+        Fixed README.
+
 0.6.2   Sun Feb 27 17:07:12 2011 +0900
         Added POD to bin/tvpot-dl.
 
 0.6.1   Sun Feb 27 16:27:26 2011 +0900
-        Moved 02-get_video_url.t to t/
+        Moved 02-get_video_url.t to t/.
 
 0.6.0   Sun Feb 27 15:51:24 2011 +0900
         Removed --title option.
