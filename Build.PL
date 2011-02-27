@@ -14,7 +14,6 @@ my $builder = Module::Build->new(
         'autodie'      => 0,
         'English'      => 0,
         'LWP::Simple'  => 0,
-        'Encode'       => 0,
         'Carp'         => 0,
         'Getopt::Long' => 0,
     },

@@ -8,8 +8,6 @@ use English qw< -no_match_vars >;
 
 use LWP::Simple qw< get >;
 
-use Encode qw< encode_utf8 >;
-
 use Carp qw< carp >;
 
 =head1 NAME
@@ -32,9 +30,6 @@ our $VERSION = '0.6.0';
 
     # Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
-
-    # Get video title
-    my $video_title = App::TvpotDl::get_video_title($video_id);
 
     # Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
@@ -67,36 +62,6 @@ sub get_video_id {
     my $video_id = $LAST_PAREN_MATCH{video_id};
 
     return $video_id;
-}
-
-=head2 get_video_title
-
-Returns title of the given video ID.
-
-=cut
-
-sub get_video_title {
-    my ($video_id) = @_;
-
-    my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
-
-    my $document = get($query_url);
-    if ( !defined $document ) {
-        carp 'Cannot fetch the document identified by the given URL: '
-            . "$query_url\n";
-        return;
-    }
-
-    # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
-    my $video_title_pattern
-        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
-    if ( $document !~ $video_title_pattern ) {
-        carp "Cannot find video title from the document.\n";
-        return;
-    }
-    my $video_title = encode_utf8( $LAST_PAREN_MATCH{video_title} );
-
-    return $video_title;
 }
 
 =head2 get_video_url
