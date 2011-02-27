@@ -39,7 +39,6 @@ Options:
   -h, --help            print this help text and exit
   -v, --version         print program version and exit
   -q, --quiet           activates quiet mode
-  -t, --title           simulate, quiet but print title
   -u, --url             simulate, quiet but print URL
 
 Argument:
@@ -63,7 +62,6 @@ END_HELP
 sub download_video {
     my ( $url, $arg_ref ) = @_;
     my $quiet_mode  = $arg_ref->{quiet_mode};
-    my $print_title = $arg_ref->{print_title};
     my $print_url   = $arg_ref->{print_url};
 
     # Step 1: Get video ID
@@ -73,18 +71,7 @@ sub download_video {
         say "Video ID: $video_id";
     }
 
-    # Step 2: Get video title
-    my $video_title = App::TvpotDl::get_video_title($video_id);
-    return if !defined $video_title;
-    if ($print_title) {
-        say $video_title;
-        return 1;
-    }
-    if ( !$quiet_mode ) {
-        say "Video title: $video_title";
-    }
-
-    # Step 3: Get video URL
+    # Step 2: Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
     return if !defined $video_url;
     if ($print_url) {
@@ -95,8 +82,8 @@ sub download_video {
         say "Video URL: $video_url";
     }
 
-    # Step 4: Download the video
-    my $file_name = "$video_title.flv";
+    # Step 3: Download the video
+    my $file_name = "$video_id.flv";
     if ( !$quiet_mode ) {
         say "Downloading the video as '$file_name'... "
             . '(It may takes several minutes.)';
@@ -118,18 +105,16 @@ my $print_help;
 my $print_version;
 
 my $quiet_mode;
-my $print_title;
 my $print_url;
 
 GetOptions(
     help    => \$print_help,
     version => \$print_version,
     quiet   => \$quiet_mode,
-    title   => \$print_title,
     url     => \$print_url,
 ) or die "GetOptions() failed!\n";
 
-$quiet_mode = $quiet_mode || $print_title || $print_url;
+$quiet_mode = $quiet_mode || $print_url;
 
 if ($print_help) {
     print_help();
@@ -164,7 +149,6 @@ if ( @urls < 1 ) {
 
 my $arg_ref = {
     quiet_mode  => $quiet_mode,
-    print_title => $print_title,
     print_url   => $print_url,
 };
 
