@@ -16,7 +16,7 @@ use autodie;
 
 use Getopt::Long;
 
-use LWP::Simple qw< getstore is_error >;
+use LWP::Simple qw< getstore is_error $ua >;
 
 use App::TvpotDl;
 
@@ -61,8 +61,8 @@ END_HELP
 
 sub download_video {
     my ( $url, $arg_ref ) = @_;
-    my $quiet_mode  = $arg_ref->{quiet_mode};
-    my $print_url   = $arg_ref->{print_url};
+    my $quiet_mode = $arg_ref->{quiet_mode};
+    my $print_url  = $arg_ref->{print_url};
 
     # Step 1: Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
@@ -88,7 +88,11 @@ sub download_video {
         say "Downloading the video as '$file_name'... "
             . '(It may takes several minutes.)';
     }
+    if ( !$quiet_mode ) {
+        $ua->show_progress(1);
+    }
     my $rc = getstore( $video_url, $file_name );
+    $ua->show_progress(0);
     if ( is_error($rc) ) {
         warn "Cannot download the video.\n";
         return;
@@ -148,20 +152,20 @@ if ( @urls < 1 ) {
 }
 
 my $arg_ref = {
-    quiet_mode  => $quiet_mode,
-    print_url   => $print_url,
+    quiet_mode => $quiet_mode,
+    print_url  => $print_url,
 };
 
 for my $i ( 0 .. $#urls ) {
     my $url = $urls[$i];
 
-    if ( !$quiet_mode ) {
+    if ( !$quiet_mode && @urls > 1 ) {
         printf "[%d/%d] %s\n", $i + 1, scalar @urls, $url;
     }
 
     download_video( $url, $arg_ref );
 
-    if ( !$quiet_mode ) {
+    if ( !$quiet_mode && @urls > 1 ) {
         say q{};    # Blank line
     }
 }
