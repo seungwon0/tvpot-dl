@@ -1,5 +1,11 @@
 Revision history for tvpot-dl
 
+0.6.0   Sun Feb 27 15:51:24 2011 +0900
+        Removed --title option.
+        Removed get_video_title subroutine.
+        Started to show download progress.
+        Use video ID as file name instead of video title.
+
 0.5.0   Sun Feb 27 01:20:14 2011 +0900
         Changed some APIs.
         Added --quiet, --title and --url option.
