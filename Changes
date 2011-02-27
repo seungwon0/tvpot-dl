@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.6.1   Sun Feb 27 16:27:26 2011 +0900
+        Moved 02-get_video_url.t to t/
+
 0.6.0   Sun Feb 27 15:51:24 2011 +0900
         Removed --title option.
         Removed get_video_title subroutine.
