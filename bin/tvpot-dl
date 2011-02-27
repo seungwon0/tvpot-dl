@@ -2,6 +2,11 @@
 #
 # tvpot-dl - Download flash videos from Daum tvpot
 #
+# tvpot-dl downloads flash videos from Daum tvpot.
+#
+# It can also be used to download movie trailers or music videos from
+# Daum.
+#
 # Seungwon Jeong <seungwon0@gmail.com>
 #
 # Copyright (C) 2011 by Seungwon Jeong
@@ -39,7 +44,7 @@ Options:
   -h, --help            print this help text and exit
   -v, --version         print program version and exit
   -q, --quiet           activates quiet mode
-  -u, --url             simulate, quiet but print URL
+  -u, --url             quiet but print URL
 
 Argument:
 
@@ -50,8 +55,7 @@ Examples:
   tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
   tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
   tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
-  tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=P3G7gyZgrVk0&playlistid=1384392&clipid=30724905' | xargs wget
-  tvpot-dl 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851'
+  tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851' | xargs wget --continue
   tvpot-dl < url_list
 
 Please report bugs to <seungwon0\@gmail.com>.
@@ -169,3 +173,94 @@ for my $i ( 0 .. $#urls ) {
         say q{};    # Blank line
     }
 }
+
+__END__
+
+=head1 NAME
+
+tvpot-dl - download flash videos from Daum tvpot
+
+=head1 SYNOPSIS
+
+tvpot-dl [options] URL ...
+
+=head1 DESCRIPTION
+
+tvpot-dl downloads flash videos from Daum tvpot.
+
+It can also be used to download movie trailers or music videos from
+Daum.
+
+=head1 ARGUMENTS
+
+=over
+
+=item URL
+
+URL of a tvpot video
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -h, --help
+
+print help text and exit
+
+=item -v, --version
+
+print program version and exit
+
+=item -q, --quiet
+
+activates quiet mode
+
+=item -u, --url
+
+quiet but print video URL
+
+=back
+
+=head1 EXAMPLES
+
+Download a tvpot video:
+
+	tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
+
+Download a music video:
+
+	tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+
+Download a movie trailer:
+
+	tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
+
+Download a video using wget:
+
+	tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851' | xargs wget --continue
+
+Download videos from url_list file:
+
+	tvpot-dl < url_list
+
+=head1 AUTHOR
+
+Seungwon Jeong E<lt>seungwon0@gmail.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Seungwon Jeong.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 SEE ALSO
+
+youtube-dl(1), get_flash_videos(1)
+
+=cut

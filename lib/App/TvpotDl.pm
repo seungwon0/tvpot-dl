@@ -16,11 +16,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.6.0
+Version 0.6.2
 
 =cut
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.6.2';
 
 =head1 SYNOPSIS
 
