@@ -16,11 +16,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.6.3
+Version 0.7.0
 
 =cut
 
-our $VERSION = '0.6.3';
+our $VERSION = '0.7.0';
 
 =head1 SYNOPSIS
 
@@ -102,9 +102,11 @@ Seungwon Jeong, C<< <seungwon0 at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-tvpot-dl at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=tvpot-dl>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<seungwon0 at
+gmail.com>, or through the web interface at
+L<https://github.com/seungwon0/tvpot-dl/issues>.  I will be notified,
+and then you'll automatically be notified of progress on your bug as I
+make changes.
 
 =head1 SUPPORT
 
@@ -114,25 +116,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=tvpot-dl>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/tvpot-dl>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/tvpot-dl>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/tvpot-dl/>
-
-=back
+L<https://github.com/seungwon0/tvpot-dl>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -197,7 +197,7 @@ Daum.
 
 =item URL
 
-URL of a tvpot video
+URL of a tvpot video.
 
 =back
 
@@ -207,19 +207,22 @@ URL of a tvpot video
 
 =item -h, --help
 
-print help text and exit
+Print help text and exit.
 
 =item -v, --version
 
-print program version and exit
+Print program version and exit.
 
 =item -q, --quiet
 
-activates quiet mode
+Activates quiet mode, avoiding many messages being written to the
+terminal.
 
 =item -u, --url
 
-quiet but print video URL
+Simulate the operation, like quiet mode, but show the URL that would
+be used to download the video. Can be used with other download tools
+like wget.
 
 =back
 
@@ -244,6 +247,10 @@ Download a video using wget:
 Download videos from url_list file:
 
 	tvpot-dl < url_list
+
+=head1 URL
+
+L<https://github.com/seungwon0/tvpot-dl>
 
 =head1 AUTHOR
 

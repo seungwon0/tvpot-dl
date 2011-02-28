@@ -1,4 +1,4 @@
-tvpot-dl 0.6.3
+tvpot-dl 0.7.0
 
 tvpot-dl downloads flash videos from Daum tvpot.
 
@@ -25,17 +25,7 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=tvpot-dl
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/tvpot-dl
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/tvpot-dl
-
-    Search CPAN
-        http://search.cpan.org/dist/tvpot-dl/
+    https://github.com/seungwon0/tvpot-dl
 
 
 LICENSE AND COPYRIGHT
