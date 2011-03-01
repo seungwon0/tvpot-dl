@@ -1,5 +1,9 @@
 Revision history for tvpot-dl
 
+0.7.1   Tue Mar 1 21:27:54 2011 +0900
+        Fixed a bug in file name.
+        Started to use HTML::Entities.
+
 0.7.0   Tue Mar 1 20:32:46 2011 +0900
         Added --get-title and --title option.
         Added get_video_title subroutine.
