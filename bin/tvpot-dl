@@ -102,7 +102,7 @@ sub download_video {
     }
 
     # Download the video
-    my $file_name = $video_title ? "$video_title.flv" : "$video_id.flv";
+    my $file_name = $title ? "$video_title.flv" : "$video_id.flv";
     if ( !$quiet_mode ) {
         say "Downloading the video as '$file_name'... "
             . '(It may takes several minutes.)';
