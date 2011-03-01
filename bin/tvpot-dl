@@ -68,19 +68,21 @@ END_HELP
 sub download_video {
     my ( $url, $arg_ref ) = @_;
     my $quiet_mode = $arg_ref->{quiet_mode};
-    my $print_url  = $arg_ref->{print_url};
+    my $get_url    = $arg_ref->{get_url};
+    my $get_title  = $arg_ref->{get_title};
+    my $title      = $arg_ref->{title};
 
-    # Step 1: Get video ID
+    # Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
     return if !defined $video_id;
     if ( !$quiet_mode ) {
         say "Video ID: $video_id";
     }
 
-    # Step 2: Get video URL
+    # Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
     return if !defined $video_url;
-    if ($print_url) {
+    if ($get_url) {
         say $video_url;
         return 1;
     }
@@ -88,8 +90,19 @@ sub download_video {
         say "Video URL: $video_url";
     }
 
-    # Step 3: Download the video
-    my $file_name = "$video_id.flv";
+    # Get video title
+    my $video_title = App::TvpotDl::get_video_title($video_id);
+    return if !defined $video_title;
+    if ($get_title) {
+        say $video_title;
+        return 1;
+    }
+    if ( !$quiet_mode ) {
+        say "Video title: $video_title";
+    }
+
+    # Download the video
+    my $file_name = $video_title ? "$video_title.flv" : "$video_id.flv";
     if ( !$quiet_mode ) {
         say "Downloading the video as '$file_name'... "
             . '(It may takes several minutes.)';
@@ -115,16 +128,20 @@ my $print_help;
 my $print_version;
 
 my $quiet_mode;
-my $print_url;
+my $get_url;
+my $get_title;
+my $title;
 
 GetOptions(
-    help    => \$print_help,
-    version => \$print_version,
-    quiet   => \$quiet_mode,
-    url     => \$print_url,
+    'help'      => \$print_help,
+    'version'   => \$print_version,
+    'quiet'     => \$quiet_mode,
+    'url'       => \$get_url,
+    'get-title' => \$get_title,
+    'title'     => \$title,
 ) or die "GetOptions() failed!\n";
 
-$quiet_mode = $quiet_mode || $print_url;
+$quiet_mode = $quiet_mode || $get_url || $get_title;
 
 if ($print_help) {
     print_help();
@@ -159,7 +176,9 @@ if ( @urls < 1 ) {
 
 my $arg_ref = {
     quiet_mode => $quiet_mode,
-    print_url  => $print_url,
+    get_url    => $get_url,
+    get_title  => $get_title,
+    title      => $title,
 };
 
 for my $i ( 0 .. $#urls ) {
