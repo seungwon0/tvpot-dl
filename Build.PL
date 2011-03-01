@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
         'LWP::Simple'  => 0,
         'Carp'         => 0,
         'Getopt::Long' => 0,
+        'Encode'       => 0,
     },
     build_requires     => { 'Test::More' => 0, },
     script_files       => [ 'bin/tvpot-dl', ],

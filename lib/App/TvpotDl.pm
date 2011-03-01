@@ -10,6 +10,8 @@ use LWP::Simple qw< get >;
 
 use Carp qw< carp >;
 
+use Encode qw< encode_utf8 >;
+
 =head1 NAME
 
 App::TvpotDl - Download flash videos from Daum tvpot
@@ -94,6 +96,36 @@ sub get_video_url {
     my $video_url = $LAST_PAREN_MATCH{video_url};
 
     return $video_url;
+}
+
+=head2 get_video_title
+
+Returns video title of the given video ID.
+
+=cut
+
+sub get_video_title {
+    my ($video_id) = @_;
+
+    my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
+
+    my $document = get($query_url);
+    if ( !defined $document ) {
+        carp 'Cannot fetch the document identified by the given URL: '
+            . "$query_url\n";
+        return;
+    }
+
+    # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
+    my $video_title_pattern
+        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
+    if ( $document !~ $video_title_pattern ) {
+        carp "Cannot find video title from the document.\n";
+        return;
+    }
+    my $video_title = encode_utf8( $LAST_PAREN_MATCH{video_title} );
+
+    return $video_title;
 }
 
 =head1 AUTHOR
