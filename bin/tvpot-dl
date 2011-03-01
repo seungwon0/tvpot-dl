@@ -45,6 +45,8 @@ Options:
   -v, --version         print program version and exit
   -q, --quiet           activates quiet mode
   -u, --url             quiet but print URL
+  -g, --get-title       quiet but print title
+  -t, --title           use title in file name
 
 Argument:
 
@@ -223,6 +225,16 @@ terminal.
 Simulate the operation, like quiet mode, but show the URL that would
 be used to download the video. Can be used with other download tools
 like wget.
+
+=item -g, --get-title
+
+Simulate the operation, like quiet mode, but show the title of the
+video that would be downloaded.
+
+=item -t, --title
+
+Use the title of the video in the file name used to download the
+video.
 
 =back
 
