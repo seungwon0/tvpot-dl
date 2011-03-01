@@ -10,7 +10,7 @@ use LWP::Simple qw< get >;
 
 use Carp qw< carp >;
 
-use Encode qw< encode_utf8 >;
+use HTML::Entities qw< decode_entities >;
 
 =head1 NAME
 
@@ -123,7 +123,10 @@ sub get_video_title {
         carp "Cannot find video title from the document.\n";
         return;
     }
-    my $video_title = encode_utf8( $LAST_PAREN_MATCH{video_title} );
+    my $video_title = $LAST_PAREN_MATCH{video_title};
+
+    # &nbps; => &
+    $video_title = decode_entities($video_title);
 
     return $video_title;
 }
