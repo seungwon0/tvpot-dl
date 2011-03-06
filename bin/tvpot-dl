@@ -274,23 +274,23 @@ video.
 
 Download a tvpot video:
 
-	tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
+ tvpot-dl 'http://tvpot.daum.net/clip/ClipView.do?clipid=29772622'
 
 Download a music video:
 
-	tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
+ tvpot-dl 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446'
 
 Download a movie trailer:
 
-	tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
+ tvpot-dl 'http://movie.daum.net/moviedetail/moviedetailVideoView.do?movieId=52843&videoId=29850'
 
 Download a video using wget:
 
-	tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851' | xargs wget --continue
+ tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851' | xargs wget --continue
 
 Download videos from url_list file:
 
-	tvpot-dl < url_list
+ tvpot-dl < url_list
 
 =head1 URL
 

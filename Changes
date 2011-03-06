@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.7.2   Sun Mar 6 23:29:51 2011 +0900
+        Added --simulate option.
+
 0.7.1   Tue Mar 1 21:27:54 2011 +0900
         Fixed a bug in file name.
         Started to use HTML::Entities.
