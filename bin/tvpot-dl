@@ -47,8 +47,9 @@ Options:
   -v, --version         print program version and exit
   -q, --quiet           activates quiet mode
   -s, --simulate        do not download video
-  -u, --url             quiet but print URL
-  -t, --title           quiet but print title
+  -u, --url             simulate, quiet but print URL
+  -t, --title           simulate, quiet but print title
+  -f, --filename        simulate, quiet but print output file name
 
 Argument:
 
@@ -69,10 +70,11 @@ END_HELP
 
 sub download_video {
     my ( $url, $arg_ref ) = @_;
-    my $quiet_mode = $arg_ref->{quiet_mode};
-    my $simulate   = $arg_ref->{simulate};
-    my $get_url    = $arg_ref->{get_url};
-    my $get_title  = $arg_ref->{get_title};
+    my $quiet_mode   = $arg_ref->{quiet_mode};
+    my $simulate     = $arg_ref->{simulate};
+    my $get_url      = $arg_ref->{get_url};
+    my $get_title    = $arg_ref->{get_title};
+    my $get_filename = $arg_ref->{get_filename};
 
     # Step 1: Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
@@ -103,26 +105,35 @@ sub download_video {
         say "Video title: $video_title";
     }
 
+    # Step 4: Get output file name
+    my $filename = "$video_title.flv";
+    $filename =~ s/\s+/_/xmsg;    # Avoid white spaces in file name
+    if ($get_filename) {
+        say $filename;
+        return 1;
+    }
+    if ( !$quiet_mode ) {
+        say "Output filename: $filename";
+    }
+
     return 1 if $simulate;
 
-    # Step 4: Download the video
-    my $file_name = "$video_title.flv";
-    $file_name =~ s/\s+/_/xmsg;    # Avoid white spaces in file name
+    # Step 5: Download the video
     if ( !$quiet_mode ) {
-        say "Downloading the video as '$file_name'... "
+        say "Downloading the video as '$filename'... "
             . '(It may takes several minutes.)';
     }
     if ( !$quiet_mode ) {
         $ua->show_progress(1);
     }
-    my $rc = getstore( $video_url, $file_name );
+    my $rc = getstore( $video_url, $filename );
     $ua->show_progress(0);
     if ( is_error($rc) ) {
         warn "Cannot download the video.\n";
         return;
     }
     if ( !$quiet_mode ) {
-        say "Successfully downloaded '$file_name'.";
+        say "Successfully downloaded '$filename'.";
     }
 
     return 1;
@@ -132,9 +143,10 @@ my $print_help;
 my $print_version;
 
 my $quiet_mode;
+my $simulate;
 my $get_url;
 my $get_title;
-my $simulate;
+my $get_filename;
 
 GetOptions(
     'help'     => \$print_help,
@@ -143,9 +155,10 @@ GetOptions(
     'simulate' => \$simulate,
     'url'      => \$get_url,
     'title'    => \$get_title,
+    'filename' => \$get_filename,
 ) or die "GetOptions() failed!\n";
 
-$quiet_mode = $quiet_mode || $get_url || $get_title;
+$quiet_mode = $quiet_mode || $get_url || $get_title || $get_filename;
 
 if ($print_help) {
     print_help();
@@ -179,10 +192,11 @@ if ( @urls < 1 ) {
 }
 
 my $arg_ref = {
-    quiet_mode => $quiet_mode,
-    simulate   => $simulate,
-    get_url    => $get_url,
-    get_title  => $get_title,
+    quiet_mode   => $quiet_mode,
+    simulate     => $simulate,
+    get_url      => $get_url,
+    get_title    => $get_title,
+    get_filename => $get_filename,
 };
 
 for my $i ( 0 .. $#urls ) {
@@ -258,6 +272,11 @@ like wget.
 
 Simulate the operation, like quiet mode, but show the title of the
 video that would be downloaded.
+
+=item -f, --filename
+
+Simulate the operation, like quiet mode, but show the output file name
+that would be used to download the video.
 
 =back
 
