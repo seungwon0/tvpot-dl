@@ -48,8 +48,7 @@ Options:
   -q, --quiet           activates quiet mode
   -s, --simulate        do not download video
   -u, --url             quiet but print URL
-  -g, --get-title       quiet but print title
-  -t, --title           use title in file name
+  -t, --title           quiet but print title
 
 Argument:
 
@@ -74,7 +73,6 @@ sub download_video {
     my $simulate   = $arg_ref->{simulate};
     my $get_url    = $arg_ref->{get_url};
     my $get_title  = $arg_ref->{get_title};
-    my $title      = $arg_ref->{title};
 
     # Step 1: Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
@@ -108,7 +106,8 @@ sub download_video {
     return 1 if $simulate;
 
     # Step 4: Download the video
-    my $file_name = $title ? "$video_title.flv" : "$video_id.flv";
+    my $file_name = "$video_title.flv";
+    $file_name =~ s/\s+/_/xmsg;    # Avoid white spaces in file name
     if ( !$quiet_mode ) {
         say "Downloading the video as '$file_name'... "
             . '(It may takes several minutes.)';
@@ -135,17 +134,15 @@ my $print_version;
 my $quiet_mode;
 my $get_url;
 my $get_title;
-my $title;
 my $simulate;
 
 GetOptions(
-    'help'      => \$print_help,
-    'version'   => \$print_version,
-    'quiet'     => \$quiet_mode,
-    'simulate'  => \$simulate,
-    'url'       => \$get_url,
-    'get-title' => \$get_title,
-    'title'     => \$title,
+    'help'     => \$print_help,
+    'version'  => \$print_version,
+    'quiet'    => \$quiet_mode,
+    'simulate' => \$simulate,
+    'url'      => \$get_url,
+    'title'    => \$get_title,
 ) or die "GetOptions() failed!\n";
 
 $quiet_mode = $quiet_mode || $get_url || $get_title;
@@ -186,7 +183,6 @@ my $arg_ref = {
     simulate   => $simulate,
     get_url    => $get_url,
     get_title  => $get_title,
-    title      => $title,
 };
 
 for my $i ( 0 .. $#urls ) {
@@ -258,15 +254,10 @@ Simulate the operation, like quiet mode, but show the URL that would
 be used to download the video. Can be used with other download tools
 like wget.
 
-=item -g, --get-title
+=item -t, --title
 
 Simulate the operation, like quiet mode, but show the title of the
 video that would be downloaded.
-
-=item -t, --title
-
-Use the title of the video in the file name used to download the
-video.
 
 =back
 

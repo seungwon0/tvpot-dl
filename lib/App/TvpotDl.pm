@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.7.2
+Version 0.8.0
 
 =cut
 
-our $VERSION = '0.7.2';
+our $VERSION = '0.8.0';
 
 =head1 SYNOPSIS
 
