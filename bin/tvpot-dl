@@ -50,6 +50,7 @@ Options:
   -u, --url             simulate, quiet but print URL
   -t, --title           simulate, quiet but print title
   -f, --filename        simulate, quiet but print output file name
+  --no-progress         do not print progress
 
 Argument:
 
@@ -75,6 +76,7 @@ sub download_video {
     my $get_url      = $arg_ref->{get_url};
     my $get_title    = $arg_ref->{get_title};
     my $get_filename = $arg_ref->{get_filename};
+    my $no_progress  = $arg_ref->{no_progress};
 
     # Step 1: Get video ID
     my $video_id = App::TvpotDl::get_video_id($url);
@@ -123,7 +125,7 @@ sub download_video {
         say "Downloading the video as '$filename'... "
             . '(It may takes several minutes.)';
     }
-    if ( !$quiet_mode ) {
+    if ( !$quiet_mode && !$no_progress ) {
         $ua->show_progress(1);
     }
     my $rc = getstore( $video_url, $filename );
@@ -147,15 +149,17 @@ my $simulate;
 my $get_url;
 my $get_title;
 my $get_filename;
+my $no_progress;
 
 GetOptions(
-    'help'     => \$print_help,
-    'version'  => \$print_version,
-    'quiet'    => \$quiet_mode,
-    'simulate' => \$simulate,
-    'url'      => \$get_url,
-    'title'    => \$get_title,
-    'filename' => \$get_filename,
+    'help'        => \$print_help,
+    'version'     => \$print_version,
+    'quiet'       => \$quiet_mode,
+    'simulate'    => \$simulate,
+    'url'         => \$get_url,
+    'title'       => \$get_title,
+    'filename'    => \$get_filename,
+    'no-progress' => \$no_progress,
 ) or die "GetOptions() failed!\n";
 
 $quiet_mode = $quiet_mode || $get_url || $get_title || $get_filename;
@@ -197,6 +201,7 @@ my $arg_ref = {
     get_url      => $get_url,
     get_title    => $get_title,
     get_filename => $get_filename,
+    no_progress  => $no_progress,
 };
 
 for my $i ( 0 .. $#urls ) {
@@ -277,6 +282,10 @@ video that would be downloaded.
 
 Simulate the operation, like quiet mode, but show the output file name
 that would be used to download the video.
+
+=item --no-progress
+
+Do not print the progress during downloads.
 
 =back
 
