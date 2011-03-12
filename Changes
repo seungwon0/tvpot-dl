@@ -1,5 +1,12 @@
 Revision history for tvpot-dl
 
+0.8.0   Sat Mar 12 12:49:55 2011 +0900
+        Do not use video ID as file name.
+        Avoid white spaces in file name.
+        Changed some command line options.
+        Added --filename option.
+        Added -no-progress option.
+
 0.7.2   Sun Mar 6 23:29:51 2011 +0900
         Added --simulate option.
 
