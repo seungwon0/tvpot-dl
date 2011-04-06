@@ -108,8 +108,7 @@ sub download_video {
     }
 
     # Step 4: Get output file name
-    my $filename = "$video_title.flv";
-    $filename =~ s/\s+/_/xmsg;    # Avoid white spaces in file name
+    my $filename = App::TvpotDl::get_filename_from_video_title($video_title);
     if ($get_filename) {
         say $filename;
         return 1;

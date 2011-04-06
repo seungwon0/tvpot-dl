@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.8.0
+Version 0.8.1
 
 =cut
 
-our $VERSION = '0.8.0';
+our $VERSION = '0.8.1';
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,36 @@ sub get_video_title {
     $video_title = decode_entities($video_title);
 
     return $video_title;
+}
+
+=head2 get_filename_from_video_title
+
+Returns file name for the given video title.
+
+=cut
+
+sub get_filename_from_video_title {
+    my ($video_title) = @_;
+
+    my $filename = $video_title;
+
+    # Remove leading and trailing white spaces
+    $filename =~ s/^\s+//xms;
+    $filename =~ s/\s+$//xms;
+
+    # Use '_' instead of white space
+    $filename =~ s/\s+/_/xmsg;
+
+    # Remove reserved characters
+    $filename =~ s{[/\\?%*:|"<>.]}{_}xmsg;
+
+    # Remove leading and trailing '_'
+    $filename =~ s/^_+//xms;
+    $filename =~ s/_+$//xms;
+
+    $filename .= '.flv';
+
+    return $filename;
 }
 
 =head1 AUTHOR
