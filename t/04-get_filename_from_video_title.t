@@ -2,8 +2,6 @@ use strict;
 
 use warnings;
 
-use utf8;
-
 use Test::More tests => 2;
 
 use App::TvpotDl;
