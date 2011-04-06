@@ -1,5 +1,9 @@
 Revision history for tvpot-dl
 
+0.8.1   Thu Apr 7 00:05:53 2011 +0900
+        Added get_filename_from_video_title subroutine.
+        Avoid some reserved characters int file name.
+
 0.8.0   Sat Mar 12 12:49:55 2011 +0900
         Do not use video ID as file name.
         Avoid white spaces in file name.
