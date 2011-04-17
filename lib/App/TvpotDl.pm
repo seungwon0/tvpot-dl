@@ -47,6 +47,12 @@ Returns video ID of the given tvpot URL.
 sub get_video_id {
     my ($url) = @_;
 
+    # http://tvpot.daum.net/best/Top.do?from=gnb#clipid=31946003
+    if ( $url =~ /[#] clipid = (?<clip_id>\d+)/xmsi ) {
+        $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid='
+            . $LAST_PAREN_MATCH{clip_id};
+    }
+
     my $document = get($url);
     if ( !defined $document ) {
         carp "Cannot fetch the document identified by the given URL: $url\n";
