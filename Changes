@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.9.0   Sun Apr 17 15:57:22 2011 +0900
+        Support more URL.
+
 0.8.1   Thu Apr 7 00:05:53 2011 +0900
         Added get_filename_from_video_title subroutine.
         Avoid some reserved characters int file name.
