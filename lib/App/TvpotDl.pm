@@ -61,9 +61,16 @@ sub get_video_id {
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
-    my $video_id_pattern
+    my $video_id_pattern_1
         = qr{" $flv_player_url [?] vid = (?<video_id>.+?) ["&]}xmsi;
-    if ( $document !~ $video_id_pattern ) {
+
+    # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
+    my $function_name      = quotemeta 'Story.UI.PlayerManager.createViewer';
+    my $video_id_pattern_2 = qr{$function_name [(] '(?<video_id>.+?)' [)]}xms;
+
+    if (   $document !~ $video_id_pattern_1
+        && $document !~ $video_id_pattern_2 )
+    {
         carp "Cannot find video ID from the document.\n";
         return;
     }
