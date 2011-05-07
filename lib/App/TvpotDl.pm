@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.10.0
+Version 0.10.1
 
 =cut
 
-our $VERSION = '0.10.0';
+our $VERSION = '0.10.1';
 
 =head1 SYNOPSIS
 
@@ -35,11 +35,6 @@ our $VERSION = '0.10.0';
 
     # Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
-
-=cut
-
-my $singer_url = quotemeta 'http://media.daum.net/entertain/showcase/singer/';
-my $singer_url_pattern = qr{^ $singer_url .* [#] (?<id>\d+) $}xmsi;
 
 =head1 SUBROUTINES
 
@@ -72,7 +67,13 @@ sub get_video_id {
 
     return if !defined $url;
 
-    return get_video_id_for_singer($url) if $url =~ $singer_url_pattern;
+    my $singer_url
+        = quotemeta 'http://media.daum.net/entertain/showcase/singer/';
+    my $singer_url_pattern = qr{^ $singer_url .* [#] (?<id>\d+) $}xmsi;
+    if ( $url =~ $singer_url_pattern ) {
+        my $id = $LAST_PAREN_MATCH{id};
+        return get_video_id_for_singer( $url, $id );
+    }
 
     # http://tvpot.daum.net/best/Top.do?from=gnb#clipid=31946003
     if ( $url =~ /[#] clipid = (?<clip_id>\d+)/xmsi ) {
@@ -118,13 +119,9 @@ Returns video ID of the given singer URL.
 =cut
 
 sub get_video_id_for_singer {
-    my ($url) = @_;
+    my ( $url, $id ) = @_;
 
-    return if !defined $url;
-
-    return if $url !~ $singer_url_pattern;
-
-    my $id = $LAST_PAREN_MATCH{id};
+    return if !defined $url || !defined $id;
 
     my $document = get($url);
     if ( !defined $document ) {
