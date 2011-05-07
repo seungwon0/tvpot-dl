@@ -114,7 +114,7 @@ sub get_video_id {
 
 =head2 get_video_id_for_singer
 
-Returns video ID of the given singer URL.
+Returns video ID of the given URL and ID.
 
 =cut
 
