@@ -1,5 +1,10 @@
 Revision history for tvpot-dl
 
+0.9.1   Sat May 7 12:06:02 2011 +0900
+        Fixed a bug in download_video subroutine.
+        Fixed a bug in get_video_id subroutine.
+        Added is_valid_video_id subroutine.
+
 0.9.0   Sun Apr 17 17:56:43 2011 +0900
         Support more URL.
 
