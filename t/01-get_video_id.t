@@ -2,7 +2,7 @@ use strict;
 
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use App::TvpotDl;
 
@@ -25,5 +25,11 @@ is( $got, $expected, "Get video id from $url" );
 $url      = 'http://tvpot.daum.net/story/StoryView.do?storyid=508';
 $got      = App::TvpotDl::get_video_id($url);
 $expected = '2oHFG_aR9uA$';
+
+is( $got, $expected, "Get video id from $url" );
+
+$url      = 'http://media.daum.net/entertain/showcase/singer/?id=5#16';
+$got      = App::TvpotDl::get_video_id($url);
+$expected = 'HZYz4R8qUEU$';
 
 is( $got, $expected, "Get video id from $url" );

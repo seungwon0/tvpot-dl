@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.9.1
+Version 0.10.0
 
 =cut
 
-our $VERSION = '0.9.1';
+our $VERSION = '0.10.0';
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,11 @@ our $VERSION = '0.9.1';
     # Get video URL
     my $video_url = App::TvpotDl::get_video_url($video_id);
 
+=cut
+
+my $singer_url = quotemeta 'http://media.daum.net/entertain/showcase/singer/';
+my $singer_url_pattern = qr{^ $singer_url .* [#] (?<id>\d+) $}xmsi;
+
 =head1 SUBROUTINES
 
 =head2 is_valid_video_id
@@ -46,6 +51,8 @@ Returns 1 if the given video ID is valid.
 
 sub is_valid_video_id {
     my ($video_id) = @_;
+
+    return if !defined $video_id;
 
     return if length $video_id != 12;
 
@@ -62,6 +69,10 @@ Returns video ID of the given tvpot URL.
 
 sub get_video_id {
     my ($url) = @_;
+
+    return if !defined $url;
+
+    return get_video_id_for_singer($url) if $url =~ $singer_url_pattern;
 
     # http://tvpot.daum.net/best/Top.do?from=gnb#clipid=31946003
     if ( $url =~ /[#] clipid = (?<clip_id>\d+)/xmsi ) {
@@ -100,6 +111,43 @@ sub get_video_id {
     return $video_id;
 }
 
+=head2 get_video_id_for_singer
+
+Returns video ID of the given singer URL.
+
+=cut
+
+sub get_video_id_for_singer {
+    my ($url) = @_;
+
+    return if !defined $url;
+
+    return if $url !~ $singer_url_pattern;
+
+    my $id = $LAST_PAREN_MATCH{id};
+
+    my $document = get($url);
+    if ( !defined $document ) {
+        carp "Cannot fetch the document identified by the given URL: $url\n";
+        return;
+    }
+
+    # id:'16', vid:'HZYz4R8qUEU$'
+    my $video_id_pattern = qr{id:'$id', \s* vid:'(?<video_id>.+?)'}xms;
+    if ( $document !~ $video_id_pattern ) {
+        carp "Cannot find video ID from the document.\n";
+        return;
+    }
+    my $video_id = $LAST_PAREN_MATCH{video_id};
+
+    # Remove white spaces in video ID.
+    $video_id =~ s/\s+//xmsg;
+
+    return if !is_valid_video_id($video_id);
+
+    return $video_id;
+}
+
 =head2 get_video_url
 
 Returns video URL of the given video ID.
@@ -108,6 +156,8 @@ Returns video URL of the given video ID.
 
 sub get_video_url {
     my ($video_id) = @_;
+
+    return if !defined $video_id;
 
     my $query_url
         = 'http://stream.tvpot.daum.net/fms/pos_query2.php'
@@ -140,6 +190,8 @@ Returns video title of the given video ID.
 
 sub get_video_title {
     my ($video_id) = @_;
+
+    return if !defined $video_id;
 
     my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
 
