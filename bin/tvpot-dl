@@ -97,8 +97,9 @@ sub download_video {
     }
 
     # Step 3: Get video title
-    my $video_title = encode_utf8( App::TvpotDl::get_video_title($video_id) );
+    my $video_title = App::TvpotDl::get_video_title($video_id);
     return if !defined $video_title;
+    $video_title = encode_utf8($video_title);
     if ($get_title) {
         say $video_title;
         return 1;
