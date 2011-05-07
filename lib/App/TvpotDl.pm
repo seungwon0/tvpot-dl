@@ -38,6 +38,22 @@ our $VERSION = '0.9.0';
 
 =head1 SUBROUTINES
 
+=head2 is_valid_video_id
+
+Returns 1 if the given video ID is valid.
+
+=cut
+
+sub is_valid_video_id {
+    my ($video_id) = @_;
+
+    return if length $video_id != 12;
+
+    return if $video_id !~ /\$$/xms;
+
+    return 1;
+}
+
 =head2 get_video_id
 
 Returns video ID of the given tvpot URL.
@@ -75,6 +91,11 @@ sub get_video_id {
         return;
     }
     my $video_id = $LAST_PAREN_MATCH{video_id};
+
+    # Remove white spaces in video ID.
+    $video_id =~ s/\s+//xmsg;
+
+    return if !is_valid_video_id($video_id);
 
     return $video_id;
 }
