@@ -62,7 +62,7 @@ sub get_video_id {
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
     my $video_id_pattern_1
-        = qr{" $flv_player_url [?] vid = (?<video_id>.+?) ["&]}xmsi;
+        = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
     my $function_name      = quotemeta 'Story.UI.PlayerManager.createViewer';
