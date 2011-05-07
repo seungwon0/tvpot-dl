@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.10.2  Sat May 7 23:05:42 2011 +0900
+        Added t/01-is_valid_video_id.t.
+
 0.10.1  Sat May 7 14:50:53 2011 +0900
         Minor changes.
 
