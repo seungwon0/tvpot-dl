@@ -35,7 +35,7 @@ sub print_version {
 sub print_help {
     print_version();
 
-    print <<"END_HELP";
+    print <<'END_HELP';
 
 Usage:
 
@@ -67,7 +67,7 @@ Examples:
   tvpot-dl --url 'http://tvpot.daum.net/brand/ProgramClipView.do?ownerid=Sa3QtEuMXf10&playlistid=1382723&clipid=25537851' | xargs wget --continue
   tvpot-dl < url_list
 
-Please report bugs to <seungwon0\@gmail.com>.
+Please report bugs to <seungwon0@gmail.com>.
 END_HELP
     return;
 }
