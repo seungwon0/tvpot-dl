@@ -28,8 +28,8 @@ $expected = '2oHFG_aR9uA$';
 
 is( $got, $expected, "Get video id from $url" );
 
-$url      = 'http://media.daum.net/entertain/showcase/singer/?id=5#16';
-$got      = App::TvpotDl::get_video_id($url);
-$expected = 'HZYz4R8qUEU$';
+$url = 'http://media.daum.net/entertain/showcase/singer/mission?id=605#83';
+$got = App::TvpotDl::get_video_id($url);
+$expected = 'VA_y85BYuE4$';
 
 is( $got, $expected, "Get video id from $url" );
