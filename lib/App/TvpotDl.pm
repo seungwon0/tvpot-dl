@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.10.3
+Version 0.11.0
 
 =cut
 
-our $VERSION = '0.10.3';
+our $VERSION = '0.11.0';
 
 =head1 SYNOPSIS
 
@@ -49,9 +49,9 @@ sub is_valid_video_id {
 
     return if !defined $video_id;
 
-    return if length $video_id != 12;
+    return if length $video_id != 12 && length $video_id != 23;
 
-    return if $video_id !~ /\$$/xms;
+    return if length $video_id == 12 && $video_id !~ /\$$/xms;
 
     return 1;
 }
@@ -67,16 +67,8 @@ sub get_video_id {
 
     return if !defined $url;
 
-    my $singer_url
-        = quotemeta 'http://media.daum.net/entertain/showcase/singer/';
-    my $singer_url_pattern = qr{^ $singer_url .* [#] (?<id>\d+) $}xmsi;
-    if ( $url =~ $singer_url_pattern ) {
-        my $id = $LAST_PAREN_MATCH{id};
-        return get_video_id_for_singer( $url, $id );
-    }
-
     # http://tvpot.daum.net/best/Top.do?from=gnb#clipid=31946003
-    if ( $url =~ /[#] clipid = (?<clip_id>\d+)/xmsi ) {
+    if ( $url =~ /[#?&] clipid = (?<clip_id>\d+)/xmsi ) {
         $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid='
             . $LAST_PAREN_MATCH{clip_id};
     }
@@ -92,12 +84,25 @@ sub get_video_id {
     my $video_id_pattern_1
         = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
 
+    my $function_name;
+
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
-    my $function_name      = quotemeta 'Story.UI.PlayerManager.createViewer';
+    $function_name = quotemeta 'Story.UI.PlayerManager.createViewer';
     my $video_id_pattern_2 = qr{$function_name [(] '(?<video_id>.+?)' [)]}xms;
 
+    # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
+    $function_name = quotemeta 'daum.Music.VideoPlayer.add';
+    my $video_id_pattern_3
+	= qr{$function_name [(] "body_mv_player", \s* "(?<video_id>.+?)",}xms;
+
+    # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
+    my $video_id_pattern_4
+	= qr{video/viewer/VideoView.html [?] vid = (?<video_id>.+?)&}xms;
+
     if (   $document !~ $video_id_pattern_1
-        && $document !~ $video_id_pattern_2 )
+        && $document !~ $video_id_pattern_2
+        && $document !~ $video_id_pattern_3
+        && $document !~ $video_id_pattern_4 )
     {
         carp "Cannot find video ID from the document.\n";
         return;
@@ -107,40 +112,10 @@ sub get_video_id {
     # Remove white spaces in video ID.
     $video_id =~ s/\s+//xmsg;
 
-    return if !is_valid_video_id($video_id);
-
-    return $video_id;
-}
-
-=head2 get_video_id_for_singer
-
-Returns video ID of the given URL and ID.
-
-=cut
-
-sub get_video_id_for_singer {
-    my ( $url, $id ) = @_;
-
-    return if !defined $url || !defined $id;
-
-    my $document = get($url);
-    if ( !defined $document ) {
-        carp "Cannot fetch the document identified by the given URL: $url\n";
-        return;
+    if (!is_valid_video_id($video_id)) {
+	carp "Invalid video ID: $video_id\n";
+	return;
     }
-
-    # id:'16', vid:'HZYz4R8qUEU$'
-    my $video_id_pattern = qr{id:'$id', \s* vid:'(?<video_id>.+?)'}xms;
-    if ( $document !~ $video_id_pattern ) {
-        carp "Cannot find video ID from the document.\n";
-        return;
-    }
-    my $video_id = $LAST_PAREN_MATCH{video_id};
-
-    # Remove white spaces in video ID.
-    $video_id =~ s/\s+//xmsg;
-
-    return if !is_valid_video_id($video_id);
 
     return $video_id;
 }
@@ -157,9 +132,8 @@ sub get_video_url {
     return if !defined $video_id;
 
     my $query_url
-        = 'http://stream.tvpot.daum.net/fms/pos_query2.php'
-        . '?service_id=1001&protocol=http&out_type=xml'
-        . "&s_idx=$video_id";
+	= 'http://videofarm.daum.net/controller/api/open/v1_2/'
+	. 'MovieLocation.apixml' . "?vid=$video_id&preset=main";
 
     my $document = get($query_url);
     if ( !defined $document ) {
@@ -168,13 +142,36 @@ sub get_video_url {
         return;
     }
 
-    # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
-    my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
-    if ( $document !~ $video_url_pattern ) {
-        carp "Cannot find video URL from the document.\n";
+    # <![CDATA[
+    # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
+    # ]]>
+    my $url_pattern
+	= qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
+    if ( $document !~ $url_pattern ) {
+        carp "Cannot find URL from the document.\n";
         return;
     }
-    my $video_url = $LAST_PAREN_MATCH{video_url};
+    my $url = $LAST_PAREN_MATCH{url};
+
+    my $video_url;
+    # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
+    if ($url =~ /pos_query2[.]php/xms) {
+	my $document = get($url);
+	if ( !defined $document ) {
+	    carp "Cannot fetch the document identified by the given URL: $url\n";
+	    return;
+	}
+
+	# movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
+	my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
+	if ( $document !~ $video_url_pattern ) {
+	    carp "Cannot find video URL from the document.\n";
+	    return;
+	}
+	$video_url = $LAST_PAREN_MATCH{video_url};
+    } else {
+	$video_url = $url;
+    }
 
     return $video_url;
 }
