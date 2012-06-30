@@ -93,11 +93,11 @@ sub get_video_id {
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
     $function_name = quotemeta 'daum.Music.VideoPlayer.add';
     my $video_id_pattern_3
-	= qr{$function_name [(] "body_mv_player", \s* "(?<video_id>.+?)",}xms;
+        = qr{$function_name [(] "body_mv_player", \s* "(?<video_id>.+?)",}xms;
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
-	= qr{video/viewer/VideoView.html [?] vid = (?<video_id>.+?)&}xms;
+        = qr{video/viewer/VideoView.html [?] vid = (?<video_id>.+?)&}xms;
 
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
@@ -112,9 +112,9 @@ sub get_video_id {
     # Remove white spaces in video ID.
     $video_id =~ s/\s+//xmsg;
 
-    if (!is_valid_video_id($video_id)) {
-	carp "Invalid video ID: $video_id\n";
-	return;
+    if ( !is_valid_video_id($video_id) ) {
+        carp "Invalid video ID: $video_id\n";
+        return;
     }
 
     return $video_id;
@@ -132,8 +132,9 @@ sub get_video_url {
     return if !defined $video_id;
 
     my $query_url
-	= 'http://videofarm.daum.net/controller/api/open/v1_2/'
-	. 'MovieLocation.apixml' . "?vid=$video_id&preset=main";
+        = 'http://videofarm.daum.net/controller/api/open/v1_2/'
+        . 'MovieLocation.apixml'
+        . "?vid=$video_id&preset=main";
 
     my $document = get($query_url);
     if ( !defined $document ) {
@@ -145,8 +146,7 @@ sub get_video_url {
     # <![CDATA[
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
     # ]]>
-    my $url_pattern
-	= qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
+    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
     if ( $document !~ $url_pattern ) {
         carp "Cannot find URL from the document.\n";
         return;
@@ -154,23 +154,26 @@ sub get_video_url {
     my $url = $LAST_PAREN_MATCH{url};
 
     my $video_url;
-    # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
-    if ($url =~ /pos_query2[.]php/xms) {
-	my $document = get($url);
-	if ( !defined $document ) {
-	    carp "Cannot fetch the document identified by the given URL: $url\n";
-	    return;
-	}
 
-	# movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
-	my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
-	if ( $document !~ $video_url_pattern ) {
-	    carp "Cannot find video URL from the document.\n";
-	    return;
-	}
-	$video_url = $LAST_PAREN_MATCH{video_url};
-    } else {
-	$video_url = $url;
+    # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
+    if ( $url =~ /pos_query2[.]php/xms ) {
+        my $document = get($url);
+        if ( !defined $document ) {
+            carp
+                "Cannot fetch the document identified by the given URL: $url\n";
+            return;
+        }
+
+     # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
+        my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
+        if ( $document !~ $video_url_pattern ) {
+            carp "Cannot find video URL from the document.\n";
+            return;
+        }
+        $video_url = $LAST_PAREN_MATCH{video_url};
+    }
+    else {
+        $video_url = $url;
     }
 
     return $video_url;
