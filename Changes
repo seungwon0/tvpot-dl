@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.11.1  Sun Jul 1 10:55:00 2012 +0900
+        Support '.mp4' file name extension as well as '.flv'.
+
 0.11.0  Sun Jul 1 01:22:14 2012 +0900
         Fixed is_valid_video_id subroutine.
         Fixed get_video_id subroutine.
