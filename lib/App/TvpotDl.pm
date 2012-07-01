@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.11.0
+Version 0.11.1
 
 =cut
 
-our $VERSION = '0.11.0';
+our $VERSION = '0.11.1';
 
 =head1 SYNOPSIS
 
@@ -159,8 +159,8 @@ sub get_video_url {
     if ( $url =~ /pos_query2[.]php/xms ) {
         my $document = get($url);
         if ( !defined $document ) {
-            carp
-                "Cannot fetch the document identified by the given URL: $url\n";
+            carp 'Cannot fetch the document identified by the given URL: '
+		. "$url\n";
             return;
         }
 
@@ -216,12 +216,12 @@ sub get_video_title {
 
 =head2 get_filename_from_video_title
 
-Returns file name for the given video title.
+Returns file name for the given video title and extension.
 
 =cut
 
 sub get_filename_from_video_title {
-    my ($video_title) = @_;
+    my ( $video_title, $extension ) = @_;
 
     my $filename = $video_title;
 
@@ -239,7 +239,7 @@ sub get_filename_from_video_title {
     $filename =~ s/^_+//xms;
     $filename =~ s/_+$//xms;
 
-    $filename .= '.flv';
+    $filename .= ".$extension";
 
     return $filename;
 }
