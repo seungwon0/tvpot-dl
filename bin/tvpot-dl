@@ -111,7 +111,9 @@ sub download_video {
     }
 
     # Step 4: Get output file name
-    my $filename = App::TvpotDl::get_filename_from_video_title($video_title);
+    my $extension = ( $video_url =~ /[.]mp4/ ) ? 'mp4' : 'flv';
+    my $filename = App::TvpotDl::get_filename_from_video_title( $video_title,
+        $extension );
     if ($get_filename) {
         say $filename;
         return 1;
