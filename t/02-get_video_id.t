@@ -28,13 +28,14 @@ $expected = '2oHFG_aR9uA$';
 
 is( $got, $expected, "Get video id from $url" );
 
-$url      = 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446';
-$got      = App::TvpotDl::get_video_id($url);
+$url = 'http://music.daum.net/song/songVideo.do?songId=8443911&videoId=8446';
+$got = App::TvpotDl::get_video_id($url);
 $expected = '_nACjJ65nKg$';
 
 is( $got, $expected, "Get video id from $url" );
 
-$url      = 'http://tvpot.daum.net/best/ThemeBest.do#themeid=5014&clipid=42907566?lu=nt_t_three_clip_3_minithumbnail';
+$url = 'http://tvpot.daum.net/best/ThemeBest.do#themeid=5014&clipid=42907566'
+    . '?lu=nt_t_three_clip_3_minithumbnail';
 $got      = App::TvpotDl::get_video_id($url);
 $expected = 'v9e2bzVuwVMM1VecpMquvpv';
 
