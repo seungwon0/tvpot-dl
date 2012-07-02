@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.11.1
+Version 0.11.2
 
 =cut
 
-our $VERSION = '0.11.1';
+our $VERSION = '0.11.2';
 
 =head1 SYNOPSIS
 
@@ -75,36 +75,36 @@ sub get_video_id {
 
     my $document = get($url);
     if ( !defined $document ) {
-        carp "Cannot fetch the document identified by the given URL: $url\n";
+        carp "Cannot fetch '${url}'";
         return;
     }
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
     my $video_id_pattern_1
-        = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
+        = qr{['"] ${flv_player_url} [?] vid = (?<video_id>[^'"&]+)}xmsi;
 
-    my $function_name;
+    my $func_name;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
-    $function_name = quotemeta 'Story.UI.PlayerManager.createViewer';
-    my $video_id_pattern_2 = qr{$function_name [(] '(?<video_id>.+?)' [)]}xms;
+    $func_name = quotemeta 'Story.UI.PlayerManager.createViewer';
+    my $video_id_pattern_2 = qr{${func_name} [(] '(?<video_id>.+?)' [)]}xms;
 
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
-    $function_name = quotemeta 'daum.Music.VideoPlayer.add';
+    $func_name = quotemeta 'daum.Music.VideoPlayer.add';
     my $video_id_pattern_3
-        = qr{$function_name [(] "body_mv_player", \s* "(?<video_id>.+?)",}xms;
+        = qr{${func_name} [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
-        = qr{video/viewer/VideoView.html [?] vid = (?<video_id>.+?)&}xms;
+        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xms;
 
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
         && $document !~ $video_id_pattern_3
         && $document !~ $video_id_pattern_4 )
     {
-        carp "Cannot find video ID from the document.\n";
+        carp 'Cannot find video ID';
         return;
     }
     my $video_id = $LAST_PAREN_MATCH{video_id};
@@ -113,7 +113,7 @@ sub get_video_id {
     $video_id =~ s/\s+//xmsg;
 
     if ( !is_valid_video_id($video_id) ) {
-        carp "Invalid video ID: $video_id\n";
+        carp "Invalid video ID: ${video_id}";
         return;
     }
 
@@ -134,12 +134,11 @@ sub get_video_url {
     my $query_url
         = 'http://videofarm.daum.net/controller/api/open/v1_2/'
         . 'MovieLocation.apixml'
-        . "?vid=$video_id&preset=main";
+        . "?vid=${video_id}&preset=main";
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp 'Cannot fetch the document identified by the given URL: '
-            . "$query_url\n";
+        carp "Cannot fetch ${query_url}";
         return;
     }
 
@@ -148,7 +147,7 @@ sub get_video_url {
     # ]]>
     my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
     if ( $document !~ $url_pattern ) {
-        carp "Cannot find URL from the document.\n";
+        carp 'Cannot find URL';
         return;
     }
     my $url = $LAST_PAREN_MATCH{url};
@@ -157,17 +156,16 @@ sub get_video_url {
 
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
     if ( $url =~ /pos_query2[.]php/xms ) {
-        my $document = get($url);
+        $document = get($url);
         if ( !defined $document ) {
-            carp 'Cannot fetch the document identified by the given URL: '
-		. "$url\n";
+            carp "Cannot fetch '${url}'";
             return;
         }
 
-     # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/OxDQ$$.flv"
-        my $video_url_pattern = qr{movieURL = "(?<video_url>.+?)"}xmsi;
+        # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/..."
+        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xmsi;
         if ( $document !~ $video_url_pattern ) {
-            carp "Cannot find video URL from the document.\n";
+            carp 'Cannot find video URL';
             return;
         }
         $video_url = $LAST_PAREN_MATCH{video_url};
@@ -194,8 +192,7 @@ sub get_video_title {
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp 'Cannot fetch the document identified by the given URL: '
-            . "$query_url\n";
+        carp "Cannot fetch '${query_url}'";
         return;
     }
 
@@ -203,7 +200,7 @@ sub get_video_title {
     my $video_title_pattern
         = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
     if ( $document !~ $video_title_pattern ) {
-        carp "Cannot find video title from the document.\n";
+        carp 'Cannot find video title';
         return;
     }
     my $video_title = $LAST_PAREN_MATCH{video_title};
