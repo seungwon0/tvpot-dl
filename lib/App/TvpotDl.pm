@@ -51,7 +51,7 @@ sub is_valid_video_id {
 
     return if length $video_id != 12 && length $video_id != 23;
 
-    return if length $video_id == 12 && $video_id !~ /\$$/xms;
+    return if length $video_id == 12 && $video_id !~ /\$ $/xms;
 
     return 1;
 }
@@ -75,25 +75,25 @@ sub get_video_id {
 
     my $document = get($url);
     if ( !defined $document ) {
-        carp "Cannot fetch '${url}'";
+        carp "Cannot fetch '$url'";
         return;
     }
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
     my $video_id_pattern_1
-        = qr{['"] ${flv_player_url} [?] vid = (?<video_id>[^'"&]+)}xmsi;
+        = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
 
     my $func_name;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
     $func_name = quotemeta 'Story.UI.PlayerManager.createViewer';
-    my $video_id_pattern_2 = qr{${func_name} [(] '(?<video_id>.+?)' [)]}xms;
+    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id>.+?) ' [)]}xms;
 
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
     $func_name = quotemeta 'daum.Music.VideoPlayer.add';
     my $video_id_pattern_3
-        = qr{${func_name} [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
+        = qr{$func_name [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
@@ -113,7 +113,7 @@ sub get_video_id {
     $video_id =~ s/\s+//xmsg;
 
     if ( !is_valid_video_id($video_id) ) {
-        carp "Invalid video ID: ${video_id}";
+        carp "Invalid video ID: $video_id";
         return;
     }
 
@@ -134,11 +134,11 @@ sub get_video_url {
     my $query_url
         = 'http://videofarm.daum.net/controller/api/open/v1_2/'
         . 'MovieLocation.apixml'
-        . "?vid=${video_id}&preset=main";
+        . "?vid=$video_id&preset=main";
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp "Cannot fetch ${query_url}";
+        carp "Cannot fetch '$query_url'";
         return;
     }
 
@@ -158,7 +158,7 @@ sub get_video_url {
     if ( $url =~ /pos_query2[.]php/xms ) {
         $document = get($url);
         if ( !defined $document ) {
-            carp "Cannot fetch '${url}'";
+            carp "Cannot fetch '$url'";
             return;
         }
 
@@ -188,11 +188,12 @@ sub get_video_title {
 
     return if !defined $video_id;
 
-    my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
+    my $query_url
+        = 'http://tvpot.daum.net/clip/ClipInfoXml.do?vid=' . $video_id;
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp "Cannot fetch '${query_url}'";
+        carp "Cannot fetch '$query_url'";
         return;
     }
 

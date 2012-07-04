@@ -28,7 +28,7 @@ use Encode qw< encode_utf8 >;
 use App::TvpotDl;
 
 sub print_version {
-    say "tvpot-dl ${App::TvpotDl::VERSION}";
+    say "tvpot-dl $App::TvpotDl::VERSION";
     return;
 }
 
@@ -84,7 +84,7 @@ sub download_video {
     my $video_id = App::TvpotDl::get_video_id($url);
     return if !defined $video_id;
     if ( !$quiet_mode ) {
-        say "Video ID: ${video_id}";
+        say "Video ID: $video_id";
     }
 
     # Step 2: Get video URL
@@ -95,7 +95,7 @@ sub download_video {
         return 1;
     }
     if ( !$quiet_mode ) {
-        say "Video URL: ${video_url}";
+        say "Video URL: $video_url";
     }
 
     # Step 3: Get video title
@@ -107,7 +107,7 @@ sub download_video {
         return 1;
     }
     if ( !$quiet_mode ) {
-        say "Video title: ${video_title}";
+        say "Video title: $video_title";
     }
 
     # Step 4: Get output file name
@@ -119,14 +119,14 @@ sub download_video {
         return 1;
     }
     if ( !$quiet_mode ) {
-        say "Output filename: ${filename}";
+        say "Output filename: $filename";
     }
 
     return 1 if $simulate;
 
     # Step 5: Download the video
     if ( !$quiet_mode ) {
-        say "Downloading the video as '${filename}'... "
+        say "Downloading the video as '$filename'... "
             . '(It may take several minutes.)';
     }
     if ( !$quiet_mode && !$no_progress ) {
@@ -135,11 +135,11 @@ sub download_video {
     my $rc = getstore( $video_url, $filename );
     $ua->show_progress(0);
     if ( is_error($rc) ) {
-        warn "Cannot download '${video_url}'.\n";
+        warn "Cannot download '$video_url'.\n";
         return;
     }
     if ( !$quiet_mode ) {
-        say "Successfully downloaded '${filename}'.";
+        say "Successfully downloaded '$filename'.";
     }
 
     return 1;
