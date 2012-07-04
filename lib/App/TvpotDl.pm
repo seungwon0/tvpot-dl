@@ -97,7 +97,7 @@ sub get_video_id {
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
-        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xms;
+        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xmsi;
 
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
@@ -145,7 +145,7 @@ sub get_video_url {
     # <![CDATA[
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
     # ]]>
-    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
+    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xms;
     if ( $document !~ $url_pattern ) {
         carp 'Cannot find URL';
         return;
@@ -155,7 +155,7 @@ sub get_video_url {
     my $video_url;
 
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
-    if ( $url =~ /pos_query2[.]php/xms ) {
+    if ( $url =~ /pos_query2[.]php/xmsi ) {
         $document = get($url);
         if ( !defined $document ) {
             carp "Cannot fetch '$url'";
@@ -163,7 +163,7 @@ sub get_video_url {
         }
 
         # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/..."
-        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xmsi;
+        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xms;
         if ( $document !~ $video_url_pattern ) {
             carp 'Cannot find video URL';
             return;
@@ -199,7 +199,7 @@ sub get_video_title {
 
     # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
     my $video_title_pattern
-        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
+        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xms;
     if ( $document !~ $video_title_pattern ) {
         carp 'Cannot find video title';
         return;
