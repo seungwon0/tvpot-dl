@@ -18,11 +18,11 @@ App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.11.2
+Version 0.11.3
 
 =cut
 
-our $VERSION = '0.11.2';
+our $VERSION = '0.11.3';
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ sub is_valid_video_id {
 
     return if length $video_id != 12 && length $video_id != 23;
 
-    return if length $video_id == 12 && $video_id !~ /\$$/xms;
+    return if length $video_id == 12 && $video_id !~ /\$ $/xms;
 
     return 1;
 }
@@ -75,29 +75,29 @@ sub get_video_id {
 
     my $document = get($url);
     if ( !defined $document ) {
-        carp "Cannot fetch '${url}'";
+        carp "Cannot fetch '$url'";
         return;
     }
 
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
     my $video_id_pattern_1
-        = qr{['"] ${flv_player_url} [?] vid = (?<video_id>[^'"&]+)}xmsi;
+        = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
 
     my $func_name;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
     $func_name = quotemeta 'Story.UI.PlayerManager.createViewer';
-    my $video_id_pattern_2 = qr{${func_name} [(] '(?<video_id>.+?)' [)]}xms;
+    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id>.+?) ' [)]}xms;
 
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
     $func_name = quotemeta 'daum.Music.VideoPlayer.add';
     my $video_id_pattern_3
-        = qr{${func_name} [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
+        = qr{$func_name [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
-        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xms;
+        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xmsi;
 
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
@@ -113,7 +113,7 @@ sub get_video_id {
     $video_id =~ s/\s+//xmsg;
 
     if ( !is_valid_video_id($video_id) ) {
-        carp "Invalid video ID: ${video_id}";
+        carp "Invalid video ID: $video_id";
         return;
     }
 
@@ -134,18 +134,18 @@ sub get_video_url {
     my $query_url
         = 'http://videofarm.daum.net/controller/api/open/v1_2/'
         . 'MovieLocation.apixml'
-        . "?vid=${video_id}&preset=main";
+        . "?vid=$video_id&preset=main";
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp "Cannot fetch ${query_url}";
+        carp "Cannot fetch '$query_url'";
         return;
     }
 
     # <![CDATA[
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
     # ]]>
-    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xmsi;
+    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xms;
     if ( $document !~ $url_pattern ) {
         carp 'Cannot find URL';
         return;
@@ -155,15 +155,15 @@ sub get_video_url {
     my $video_url;
 
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
-    if ( $url =~ /pos_query2[.]php/xms ) {
+    if ( $url =~ /pos_query2[.]php/xmsi ) {
         $document = get($url);
         if ( !defined $document ) {
-            carp "Cannot fetch '${url}'";
+            carp "Cannot fetch '$url'";
             return;
         }
 
         # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/..."
-        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xmsi;
+        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xms;
         if ( $document !~ $video_url_pattern ) {
             carp 'Cannot find video URL';
             return;
@@ -188,17 +188,18 @@ sub get_video_title {
 
     return if !defined $video_id;
 
-    my $query_url = "http://tvpot.daum.net/clip/ClipInfoXml.do?vid=$video_id";
+    my $query_url
+        = 'http://tvpot.daum.net/clip/ClipInfoXml.do?vid=' . $video_id;
 
     my $document = get($query_url);
     if ( !defined $document ) {
-        carp "Cannot fetch '${query_url}'";
+        carp "Cannot fetch '$query_url'";
         return;
     }
 
     # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
     my $video_title_pattern
-        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xmsi;
+        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xms;
     if ( $document !~ $video_title_pattern ) {
         carp 'Cannot find video title';
         return;
@@ -223,8 +224,8 @@ sub get_filename_from_video_title {
     my $filename = $video_title;
 
     # Remove leading and trailing white spaces
-    $filename =~ s/^\s+//xms;
-    $filename =~ s/\s+$//xms;
+    $filename =~ s/^ \s+//xms;
+    $filename =~ s/\s+ $//xms;
 
     # Use '_' instead of white space
     $filename =~ s/\s+/_/xmsg;
@@ -233,8 +234,11 @@ sub get_filename_from_video_title {
     $filename =~ s{[/\\?%*:|"<>.]}{_}xmsg;
 
     # Remove leading and trailing '_'
-    $filename =~ s/^_+//xms;
-    $filename =~ s/_+$//xms;
+    $filename =~ s/^ _+//xms;
+    $filename =~ s/_+ $//xms;
+
+    # Suppress repeated '_'
+    $filename =~ s/__+/_/xmsg;
 
     $filename .= ".$extension";
 

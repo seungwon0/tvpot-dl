@@ -2,7 +2,7 @@ use strict;
 
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use App::TvpotDl;
 
@@ -34,3 +34,11 @@ $got
 $expected = 'title.mp4';
 
 is( $got, $expected, '.mp4 extension' );
+
+$video_title = '__a__b__c__';
+$extension   = 'mp4';
+$got
+    = App::TvpotDl::get_filename_from_video_title( $video_title, $extension );
+$expected = 'a_b_c.mp4';
+
+is( $got, $expected, q{Repeated '_'} );
