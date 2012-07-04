@@ -224,8 +224,8 @@ sub get_filename_from_video_title {
     my $filename = $video_title;
 
     # Remove leading and trailing white spaces
-    $filename =~ s/^\s+//xms;
-    $filename =~ s/\s+$//xms;
+    $filename =~ s/^ \s+//xms;
+    $filename =~ s/\s+ $//xms;
 
     # Use '_' instead of white space
     $filename =~ s/\s+/_/xmsg;
@@ -234,8 +234,11 @@ sub get_filename_from_video_title {
     $filename =~ s{[/\\?%*:|"<>.]}{_}xmsg;
 
     # Remove leading and trailing '_'
-    $filename =~ s/^_+//xms;
-    $filename =~ s/_+$//xms;
+    $filename =~ s/^ _+//xms;
+    $filename =~ s/_+ $//xms;
+
+    # Suppress repeated '_'
+    $filename =~ s/__+/_/xmsg;
 
     $filename .= ".$extension";
 
