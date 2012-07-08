@@ -2,7 +2,7 @@ use strict;
 
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use App::TvpotDl;
 
@@ -38,5 +38,11 @@ $url = 'http://tvpot.daum.net/best/ThemeBest.do#themeid=5014&clipid=42907566'
     . '?lu=nt_t_three_clip_3_minithumbnail';
 $got      = App::TvpotDl::get_video_id($url);
 $expected = 'v9e2bzVuwVMM1VecpMquvpv';
+
+is( $got, $expected, "Get video id from $url" );
+
+$url      = 'http://ebs.daum.net/knowledge/episode/6922';
+$got      = App::TvpotDl::get_video_id($url);
+$expected = 'vd247EUCULRUVVUQSVytEDS';
 
 is( $got, $expected, "Get video id from $url" );
