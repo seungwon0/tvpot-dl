@@ -68,7 +68,7 @@ sub get_video_id {
     return if !defined $url;
 
     # http://tvpot.daum.net/best/Top.do?from=gnb#clipid=31946003
-    if ( $url =~ /[#?&] clipid = (?<clip_id>\d+)/xmsi ) {
+    if ( $url =~ /[#?&] clipid = (?<clip_id> \d+)/xmsi ) {
         $url = 'http://tvpot.daum.net/clip/ClipView.do?clipid='
             . $LAST_PAREN_MATCH{clip_id};
     }
@@ -82,27 +82,32 @@ sub get_video_id {
     # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
     my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
     my $video_id_pattern_1
-        = qr{['"] $flv_player_url [?] vid = (?<video_id>[^'"&]+)}xmsi;
+        = qr{['"] $flv_player_url [?] vid = (?<video_id> [^'"&]+)}xmsi;
 
     my $func_name;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
     $func_name = quotemeta 'Story.UI.PlayerManager.createViewer';
-    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id>.+?) ' [)]}xms;
+    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id> .+?) ' [)]}xms;
 
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
     $func_name = quotemeta 'daum.Music.VideoPlayer.add';
     my $video_id_pattern_3
-        = qr{$func_name [(] "body_mv_player", \s* " (?<video_id>.+?) " ,}xms;
+        = qr{$func_name [(] "body_mv_player", \s* " (?<video_id> .+?) " ,}xms;
 
     # controller/video/viewer/VideoView.html?vid=90-m2tl87zM$&play_loc=...
     my $video_id_pattern_4
-        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id>.+?) &}xmsi;
+        = qr{/video/viewer/VideoView.html [?] vid = (?<video_id> .+?) &}xmsi;
+
+    # DaumVodPlayer.swf?vid=vd247EUCULRUVVUQSVytEDS&...
+    my $video_id_pattern_5
+        = qr{DaumVodPlayer[.]swf [?] vid = (?<video_id> .+?) &}xmsi;
 
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
         && $document !~ $video_id_pattern_3
-        && $document !~ $video_id_pattern_4 )
+        && $document !~ $video_id_pattern_4
+        && $document !~ $video_id_pattern_5 )
     {
         carp 'Cannot find video ID';
         return;
@@ -145,7 +150,7 @@ sub get_video_url {
     # <![CDATA[
     # http://cdn.flvs.daum.net/fms/pos_query2.php?service_id=1001&protocol=...
     # ]]>
-    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url>.+?) \s* \]\]>}xms;
+    my $url_pattern = qr{<!\[CDATA\[ \s* (?<url> .+?) \s* \]\]>}xms;
     if ( $document !~ $url_pattern ) {
         carp 'Cannot find URL';
         return;
@@ -163,7 +168,7 @@ sub get_video_url {
         }
 
         # movieURL="http://stream.tvpot.daum.net/swxwT-/InNM6w/JgEM-E/..."
-        my $video_url_pattern = qr{movieURL = " (?<video_url>.+?) "}xms;
+        my $video_url_pattern = qr{movieURL = " (?<video_url> .+?) "}xms;
         if ( $document !~ $video_url_pattern ) {
             carp 'Cannot find video URL';
             return;
@@ -199,7 +204,7 @@ sub get_video_title {
 
     # <TITLE><![CDATA[Just The Way You Are]]></TITLE>
     my $video_title_pattern
-        = qr{<TITLE> <!\[CDATA \[ (?<video_title>.+?) \] \]> </TITLE>}xms;
+        = qr{<TITLE> <!\[CDATA \[ (?<video_title> .+?) \] \]> </TITLE>}xms;
     if ( $document !~ $video_title_pattern ) {
         carp 'Cannot find video title';
         return;
