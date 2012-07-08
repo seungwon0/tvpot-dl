@@ -1,5 +1,8 @@
 Revision history for tvpot-dl
 
+0.11.4  Sun Jul 8 14:44:21 2012 +0900
+        Support ebs.daum.net.
+
 0.11.3  Thu Jul 5 00:46:40 2012 +0900
         Suppress repeated '_' in file name.
         Minor change in RegExp flags.
