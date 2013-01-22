@@ -12,17 +12,19 @@ use Carp qw< carp >;
 
 use HTML::Entities qw< decode_entities >;
 
+use LWP::UserAgent;
+
 =head1 NAME
 
 App::TvpotDl - Download flash videos from Daum tvpot
 
 =head1 VERSION
 
-Version 0.11.4
+Version 0.11.5
 
 =cut
 
-our $VERSION = '0.11.4';
+our $VERSION = '0.11.5';
 
 =head1 SYNOPSIS
 
@@ -79,16 +81,15 @@ sub get_video_id {
         return;
     }
 
-    # "http://flvs.daum.net/flvPlayer.swf?vid=FlVGvam5dPM$"
-    my $flv_player_url = quotemeta 'http://flvs.daum.net/flvPlayer.swf';
+    # VodPlayer.swf?vid=3i5f_JquGsk$
     my $video_id_pattern_1
-        = qr{['"] $flv_player_url [?] vid = (?<video_id> [^'"&]+)}xmsi;
+        = qr{VodPlayer[.]swf [?] vid = (?<video_id> .+?) ["'&]}xmsi;
 
     my $func_name;
 
     # Story.UI.PlayerManager.createViewer('2oHFG_aR9uA$');
     $func_name = quotemeta 'Story.UI.PlayerManager.createViewer';
-    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id> .+?) ' [)]}xms;
+    my $video_id_pattern_2 = qr{$func_name [(] ' (?<video_id> .+?) '}xms;
 
     # daum.Music.VideoPlayer.add("body_mv_player", "_nACjJ65nKg$",
     $func_name = quotemeta 'daum.Music.VideoPlayer.add';
@@ -99,16 +100,12 @@ sub get_video_id {
     my $video_id_pattern_4
         = qr{/video/viewer/VideoView.html [?] vid = (?<video_id> .+?) &}xmsi;
 
-    # DaumVodPlayer.swf?vid=vd247EUCULRUVVUQSVytEDS&...
-    my $video_id_pattern_5
-        = qr{DaumVodPlayer[.]swf [?] vid = (?<video_id> .+?) &}xmsi;
-
     if (   $document !~ $video_id_pattern_1
         && $document !~ $video_id_pattern_2
         && $document !~ $video_id_pattern_3
-        && $document !~ $video_id_pattern_4
-        && $document !~ $video_id_pattern_5 )
+        && $document !~ $video_id_pattern_4 )
     {
+        carp $document;
         carp 'Cannot find video ID';
         return;
     }
