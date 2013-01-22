@@ -1,5 +1,9 @@
 Revision history for tvpot-dl
 
+0.11.5  Tue Jan 22 11:06:19 2013 +0900
+        Change regexp patterns in get_video_id subroutine
+        Change t/03-get_video_url.t
+
 0.11.4  Sun Jul 8 14:44:21 2012 +0900
         Support ebs.daum.net.
 
