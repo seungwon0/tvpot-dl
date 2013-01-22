@@ -12,8 +12,6 @@ use Carp qw< carp >;
 
 use HTML::Entities qw< decode_entities >;
 
-use LWP::UserAgent;
-
 =head1 NAME
 
 App::TvpotDl - Download flash videos from Daum tvpot
@@ -105,7 +103,6 @@ sub get_video_id {
         && $document !~ $video_id_pattern_3
         && $document !~ $video_id_pattern_4 )
     {
-        carp $document;
         carp 'Cannot find video ID';
         return;
     }
